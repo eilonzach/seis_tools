@@ -1,0 +1,79 @@
+% function [ Mr ] = radpattern(str,dip,rak,phase)
+%RADPATTERN Summary of this function goes here
+%   Detailed explanation goes here
+
+% Use moment tensor to calculate radiation pattern for p, sv, sh 
+% 
+if nargin < 4 
+    phase = 'p'; % default is p-wave radiation pattern
+end
+phases = {'p','sv','sh'};
+
+%% While testing
+str = 296; % strike of FAULT plane in degrees
+dip = 26; % dip of fault in degrees
+rak = 87; % rake of slip (+90 is pure thrust, 0 is L-lateral)
+str = 0; % strike of FAULT plane in degrees
+dip = 90; % dip of fault in degrees
+rak = 00; % rake of slip (+90 is pure thrust, 0 is L-lateral)
+
+%% Part 1: Calculate moment tensor elements in mode coordinate system
+% (r, theta, phi) = (up, south, east).
+% use M_ij = s_i*n_j + s_j*n_i
+% find slip vector in mode coord system 
+s = [1; 0; 0]; % slip in 1 direction
+n = [0; 1; 0]; % normal in 2 direction
+M = s*n' + n*s';
+% consider as a set of rotation matrices transforming from the fault coord
+% system which has slip vector (1,0,0) and fault plane normal (0,1,0)
+% thus transforming to the strike-dip-rake system is a series of negative
+% rotations: 
+% 1) +rak about [0,1,0] % R-lateral conventionally +ive - changes sign
+% 2) -(dip about [1,0,0]
+% 3) -str about [0,0,1] 
+R1 = [cosd(rak) 0 sind(rak); 0 1 0; -sind(rak) 0 cosd(rak)];
+R2 = [1 0 0; 0 -sind(dip) -cosd(dip); 0 cosd(dip) -sind(dip)];
+R3 = [cosd(str) sind(str) 0; -sind(str) cosd(str) 0; 0 0 1];
+R4 = [1 0 0; 0 -1 0; 0 0 -1]; % goes from NWZ to NE-Z
+R = R4*R3*R2*R1;
+Mr = R*M*R';
+%% Part 2: Calculate and plot radiation pattern
+% now do everything in NE-Z coord system
+[U,D] = eig(Mr);
+D=diag(D);
+is1 = find(D==max(D));
+is3 = find(D==min(D));
+is2 = setdiff([1:3],[is1,is3]);
+
+Nr = 50;
+Naz = 360;
+r = linspace(0,4,Nr)'; % each column a different r
+inc = 2*asin(sind(45)*r/max(r));
+% for polar plot, r = r_max * (sin(inc/2)/sin(45))
+%                   = r_max * (cos(dip/2) - sin(dip/2))
+az = linspace(0,2*pi,Naz+1)'; % each row a different az
+X = sin(az)*r';
+Y = cos(az)*r';
+Z = zeros(Naz+1,Nr,3); % each row is a different azimuth, column is different r, layers are P, SV,SH
+% for ir = 1:length(r)
+for iz = 1:length(az)
+%     p = [sin(inc(ir))*cos(az(iz));...
+%          sin(inc(ir))*sin(az(iz));...
+%          cos(inc(ir))];
+%     Z(iz,ir) = p'*Mr*p; % instantaneous motion (scalar)
+R = radpattern_simp(str,dip,rak,r2d(az(iz)),r2d(inc));
+Z(iz,ir) = R(3);
+end    
+% end
+figure(11); clf
+pcolor(X,Y,-Z)
+caxis([-0.5 0.5])
+colormap(redbluecmap)
+shading interp
+axis equal
+
+
+
+
+% end
+

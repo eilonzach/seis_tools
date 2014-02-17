@@ -1,0 +1,51 @@
+#!/bin/bash
+# Updated 20/3/2012 22:41 ZJE
+# This script requires a file (trxin.txt) of stations, channels, and start times for the waveform window 
+## statA chanA timeA
+## statB chanB timeB
+## statC chanC timeC
+## etc. 
+
+# stat* is the name of the station (must match the antelope tables)
+# chan* is the name of the channel (must match the antelope tables)
+# time* is the time for the beginning of the window around the relevant arrival,
+#       in the format YYYY-DDD HH:MM:SS
+# The trexcerpt command builds sac files from the window accordingly
+
+## Required inputs - the name of the database, the channel names,
+## and the file with the correction angles
+db=../cdpapuall	  #for example
+chanE=BH0	#for example
+chanE2=BHE	#for example
+chanN=BH1	#for example
+chanN2=BHN	#for example
+chanZ=BHZ	#for example
+echo "Give the name of the file containing the time excerpt data"
+read INFILE
+i=1
+## go through line by line getting information
+while [ $i -le  $(awk 'END { print NR }' < $INFILE) ]; do
+stat=$(awk -v ii=$i 'NR==ii {print $1}'< $INFILE)
+chan=$(awk -v ii=$i 'NR==ii {print $2}'< $INFILE)
+timestart=$(awk -v ii=$i 'NR==ii {printf("%s %s",$3,$4)}'< $INFILE)
+windl=$(awk -v ii=$i 'NR==ii {print $5}'< $INFILE)
+
+if [ "$chan" = "$chanE" ]; then
+CHAN=e
+elif [ "$chan" = "$chanE2" ]; then
+CHAN=e
+elif [ "$chan" = "$chanN" ]; then
+CHAN=n
+elif [ "$chan" = "$chanN2" ]; then
+CHAN=n
+elif [ "$chan" = "$chanZ" ]; then
+CHAN=z
+fi
+
+# do the excerpting
+trexcerpt -vvo sc -w data/%{sta}/%Y.%j.%H.%M.%S.%{sta}.sac.$CHAN\
+ -c "chan=='$chan' && sta=='$stat'" $db portapng "$timestart" $windl
+# N.B. If a verbose output is not required, remove the "-v" in the two lines above
+# N.B. If confirmations for each change are not required, remove the "-c" in the two lines above
+let i=i+1
+done
