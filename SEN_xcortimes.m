@@ -87,10 +87,51 @@ end
 % decide that mean of N arrivals is zero
  G(end,1:nstas) = 1;
  acor(end) = 1;
+ 
+%% balance up weighting of dT data
+%    * w^2 X + y^2 Y = X + Y = tr(A)
+%    * w^2 = 1 + (Y/X)(1 - y^2)
+%    * where w is the weighting of the tdiff part, y is the weighting of
+%       the dt part, X is the trace of the squared  tdiff part, Y is the 
+%       trace of the squared dT part
+dz = handshake(nstas)*2;
+dx = nstas;
+ix = 1:dz;
+iy = dz+1:dz+dx;
+A = G'*G; % A = G(tdiff)'*G(tdiff) + G(dT)'*G(dT) + [ones(nstas) zeros(nstas); zeros(nstas) zeros(nstas)] 
+          % so tr(A) = tr(X) + tr(Y) + nstas;
+X = G(ix,:)'*G(ix,:); % tr(X) = dz
+Y = G(iy,:)'*G(iy,:); % tr(Y) = 2*dx
+% now, trace of weighted X or weighted Y = unweighted trace * mean(wt.^2)
+% if we up-weight dT by a factor of upw, we weight tdiff by factor gamma,
+% where:
+%  gamma^2 = ( tr(A) - nstas - mean(upw*wts(iy))*tr(Y) ) / (mean(wts(ix))*tr(X) )
+
+% USING THIS UPWEIGHTING MAKES two parts of G have SAME trace
+upw = sqrt(nstas/(2*mean(acor(iy).^2))); %   <<== UPWEIGHTING OF dT DATA  
+% USING THIS UPWEIGHTING SCALES two parts of G to the ratio of mean square of wts
+upw = sqrt( nstas/( mean(acor(iy).^2) + mean(acor(ix).^2) ) ); %   <<== UPWEIGHTING OF dT DATA  
+
+% decide weights are by acor
+gamma = sqrt(( trace(A) - nstas - upw.^2*mean(acor(iy).^2)*trace(Y) ) / ...
+                (mean(acor(ix).^2)*trace(X) ));
+
+            wt = [gamma*acor(ix); upw*acor(iy); 1];
+Wd = diag(wt.^2);
+
+% while testing:
+% A_ = G'*diag(wt.^2)*G;
+% X_ = G(ix,:)'*diag(wt(ix).^2)*G(ix,:);
+% Y_ = G(iy,:)'*diag(wt(iy).^2)*G(iy,:);
+% % by construction (choice of upw) now trace(X_) = trace(Y_)
+% trace(X)
+% trace(Y)
+% trace(X_)
+% trace(Y_)
+
 
 
 %% Solve for m
-Wd = diag(acor);
 % Wd = eye(size(Wd));
 m = (G'*Wd*G)\G'*Wd*d;
 resid = d - G*m;
@@ -102,7 +143,7 @@ dtN = mN*dt + pretime;
 dtE = mE*dt + pretime;
 dtNE = dtN-dtE;
 
-[dtN dtE dtNE]
+[dtN dtE dtNE];
 
 %% find acor
 stakN = zeros(npts,1);
