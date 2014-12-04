@@ -178,30 +178,42 @@ acorNE = acor(handshake(nstas)*2 + (1:nstas));
 
 %% Plot
 if (plotopt>0) 
-    figure(plotopt), clf
+    
+figure(plotopt), clf
+set(gcf,'pos',[0 350 1050 450])
 tt0=dt.*(0:(npts-1))-pretime;
 
-subplot(223);  plot((tstak*dt)-2*pretime,stakN,'r','Linewidth',5)
-subplot(224);  plot((tstak*dt)-2*pretime,stakE,'r','Linewidth',5)
-
-
 for is=1:nstas
-    subplot(221); hold on
-    plot(tt0,datNE(:,is,1),'Linewidth',1.5);
-    title('Pre-alignment North')
+    subplot(2,3,1); hold on
+    plot(tt0-mean([dtN;dtE]),datNE(:,is,1),'b','Linewidth',1.5);
+    title('Pre-alignment North'), xlim([-7 13]), set(gca,'FontSize',7)
     
-    subplot(223); hold on
-    plot(tt0-dtN(is),datNE(:,is,1),'Linewidth',1.5);
-    title('Post-alignment North')
+    subplot(2,3,4); hold on
+    plot(tt0-dtN(is),datNE(:,is,1),'b','Linewidth',1.5);
+    title('Post-alignment North'), xlim([-7 13]), set(gca,'FontSize',7)
     
-    subplot(222); hold on
-    plot(tt0,datNE(:,is,2),'Linewidth',1.5);
-    title('Pre-alignment East')
+    subplot(2,3,2); hold on
+    plot(tt0-mean([dtN;dtE]),datNE(:,is,2),'c','Linewidth',1.5);
+    title('Pre-alignment East'), xlim([-7 13]), set(gca,'FontSize',7)
     
-    subplot(224); hold on
-    plot(tt0-dtE(is),datNE(:,is,2),'Linewidth',1.5);
-    title('Post-alignment East')
+    subplot(2,3,5); hold on
+    plot(tt0-dtE(is),datNE(:,is,2),'c','Linewidth',1.5);
+    title('Post-alignment East'), xlim([-7 13]), set(gca,'FontSize',7)
+    
+    subplot(2,3,3); hold on
+    plot(tt0-mean([dtN;dtE]),datNE(:,is,1),'b','Linewidth',1);
+    plot(tt0-mean([dtN;dtE]),datNE(:,is,2),'c','Linewidth',1);
+    title('Pre-alignment N vs E'), xlim([-7 13]), set(gca,'FontSize',7)
+    
+    subplot(2,3,6); hold on
+    plot(tt0-dtN(is),datNE(:,is,1),'b','Linewidth',1);
+    plot(tt0-dtE(is),datNE(:,is,2),'c','Linewidth',1);
+    title('Post-alignment N vs E'), xlim([-7 13]), set(gca,'FontSize',7)
 end
+
+subplot(2,3,4);  plot((tstak*dt)-2*pretime,stakN,'r','Linewidth',1)
+subplot(2,3,5);  plot((tstak*dt)-2*pretime,stakE,'r','Linewidth',1)
+
 
 end % on plotopt
 
