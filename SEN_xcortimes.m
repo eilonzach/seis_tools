@@ -85,8 +85,8 @@ end
 
 %% optional - G is not singular as is...
 % decide that mean of N arrivals is zero
- G(end,1:nstas) = 1;
- acor(end) = 1;
+G(end,1:nstas) = 1;
+acor(end) = 1;
  
 %% balance up weighting of dT data
 %    * w^2 X + y^2 Y = X + Y = tr(A)
@@ -111,12 +111,12 @@ Y = G(iy,:)'*G(iy,:); % tr(Y) = 2*dx
 upw = sqrt(nstas/(2*mean(acor(iy).^2))); %   <<== UPWEIGHTING OF dT DATA  
 % USING THIS UPWEIGHTING SCALES two parts of G to the ratio of mean square of wts
 upw = sqrt( nstas/( mean(acor(iy).^2) + mean(acor(ix).^2) ) ); %   <<== UPWEIGHTING OF dT DATA  
+% upw = 2
 
 % decide weights are by acor
 gamma = sqrt(( trace(A) - nstas - upw.^2*mean(acor(iy).^2)*trace(Y) ) / ...
                 (mean(acor(ix).^2)*trace(X) ));
-
-            wt = [gamma*acor(ix); upw*acor(iy); 1];
+wt = [gamma*acor(ix); upw*acor(iy); 1];
 Wd = diag(wt.^2);
 
 % while testing:
