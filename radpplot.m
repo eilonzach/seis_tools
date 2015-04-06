@@ -1,4 +1,4 @@
-function [ Z, X, Y ] = radpplot(str,dip,rak,psvsh,fign,subp)
+function [ Z, X, Y ] = radpplot(str,dip,rak,psvsh,fign,subp);
 % [ Z, X, Y ] = radpplot(str,dip,rak,psvsh,fign,subp)
 % This script plots the radiation pattern for the input fault geometry and
 % the given phase. If no phase is given, does P
