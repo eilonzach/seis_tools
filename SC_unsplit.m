@@ -62,11 +62,11 @@ dTEV = dTs(it2);
 if plotopt
     figure(1); clf
     subplot(3,1,1)
-    plot([datN,datE])
+    plot([datN,datE]), title('datN (blue) datE (green)')
     subplot(3,1,2)
-    plot(datRT)
+    plot(datRT), title('datR (blue) datT (green)')
     subplot(3,1,3)
-    plot([Ru,Tu])
+    plot([Ru,Tu]), title('datR-unsplit (blue)  datT-unsplit (green)')
     
     figure(2)
     pcolor(Emap)

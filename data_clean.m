@@ -1,5 +1,5 @@
-function [ datwf,datf,datc,fdeets,ttswf,tts ] = data_clean( traces,cleaning_parm )
-% [ datf,datc,filtnam,ttsf,tts ] = data_clean( traces,cleaning_parm )
+function [ datwf,datf,datwc,datc,fdeets,ttws,tts ] = data_clean( traces,cleaning_parm )
+% [ datwf,datf,datwc,datc,fdeets,ttsw,tts ] = data_clean( traces,cleaning_parm )
 %Function to clean (detrend etc.) filter and window data from N stations
 % Taper and window chosen so that prex=0, postx=10, taperx = 0.1 will be
 % start at prex (=0), ramp up to 1 at nwin/taperx (=1), and then ramp down from 1 to 0
@@ -20,11 +20,15 @@ function [ datwf,datf,datc,fdeets,ttswf,tts ] = data_clean( traces,cleaning_parm
 %     cleaning_parm.norm     = whether (1) or not (0) to normalise traces by std
 %
 % OUTPUTS
-%  datf    = cleaned, windowed, tapered, filtered data in columns
+%  datwf   = cleaned, windowed, tapered, filtered data in columns
+%  datf    = cleaned, filtered data in columns
+%  datc    = cleaned, windowed, tapered data in columns
 %  datc    = cleaned data in columns
 %  filtnam = string with filter information
-%  ttsf    = vector of times for the filtered, windowed traces
+%  ttws    = vector of times for the filtered, windowed traces
 %  tts     = vector of times for unfiltered, unwindowed, clean traces
+%
+% Written by Z. Eilon 08/2015
 cp = cleaning_parm;
 
 nsta = size(traces,2);
@@ -63,49 +67,53 @@ datf=zeros(size(traces));
 datc=zeros(size(traces));
 
 for is=1:nsta
-%% Clean traces
-rec=traces(:,is);
-% isfi=find(isfinite(rec));
-% mn=nanmean(rec(isfi));    % Deal with NaNs
-% inan=find(isnan(rec)); % find NaNs
-nnan=find(~isnan(rec)); % find not-NaNs
-% rec(nnan)=rec(nnan)-mn; % take off mean 
-rec(nnan)=detrend(rec(nnan)); % detrend not-nans
-rec(isnan(rec))=0; %set NaNs to zero
-wdo1 = [zeros(nnan(1)-1,1);tukeywin(length(nnan),2*cp.taperx);zeros(length(rec)-nnan(end),1)];
-rec = rec.*wdo1; % first taper of whole window. Sets NaNs to zero and tapers end of non-NaN
-if (length(nnan)<2)      % skip over garbage trace
-  fprintf('Garbage trace number %d\n');
-  datc(:,is)=zeros(size(rec));
-  continue
-end
-datc(:,is)=rec;
+    %% Clean traces
+    rec=traces(:,is);
+    % isfi=find(isfinite(rec));
+    % mn=nanmean(rec(isfi));    % Deal with NaNs
+    % inan=find(isnan(rec)); % find NaNs
+    nnan=find(~isnan(rec)); % find not-NaNs
+    % rec(nnan)=rec(nnan)-mn; % take off mean 
+    rec(nnan)=detrend(rec(nnan)); % detrend not-nans
+    rec(isnan(rec))=0; %set NaNs to zero
+    wdo1 = [zeros(nnan(1)-1,1);tukeywin(length(nnan),2*cp.taperx);zeros(length(rec)-nnan(end),1)];
+    rec = rec.*wdo1; % first taper of whole window. Sets NaNs to zero and tapers end of non-NaN
+    if (length(nnan)<2)      % skip over garbage trace
+      fprintf('Garbage trace number %d\n');
+      datc(:,is)=zeros(size(rec));
+      continue
+    end
+    datc(:,is)=rec;
+    
+    % window
+    recw=rec.*wdo2;
+    datwc(:,is)=recw(jbds);
 
-%% Build xcorr data
-% pad with plenty of zeros for the filter
-rec = [zeros(1000,1);rec;zeros(1000,1)]; 
-    % option 1: filter with phase
-    % recf=filter(bb, aa, rec);
-% zerophase bandpass filter & window
-recf=filtfilt(bb, aa, rec);
-% lop off padding
-recf = recf(1001:end-1000);
+    %% Build xcorr data
+    % pad with plenty of zeros for the filter
+    rec = [zeros(1000,1);rec;zeros(1000,1)]; 
+        % option 1: filter with phase
+        % recf=filter(bb, aa, rec);
+    % zerophase bandpass filter & window
+    recf=filtfilt(bb, aa, rec);
+    % lop off padding
+    recf = recf(1001:end-1000);
 
-datf(:,is)=recf;
-if cp.norm==1
-    datf(:,is)=datf(:,is)./std(recf);
-end
+    datf(:,is)=recf;
 
-% window
-recwf=recf.*wdo2;
-datwf(:,is)=recwf(jbds);
-if cp.norm==1
-    datwf(:,is)=datwf(:,is)./std(recf);
-end
+    % window
+    recwf=recf.*wdo2;
+    datwf(:,is)=recwf(jbds);
+    
+    % normalize
+    if cp.norm==1
+    	datf(:,is)=datf(:,is)./std(recf);
+        datwf(:,is)=datwf(:,is)./std(recf);
+    end
 
 end % stas loop
 
 tts =  (0:(npt-1)).*dt - cp.pretime;
-ttswf = (ibds(1):ibds(2)).*dt - cp.pretime;
+ttws = (ibds(1):ibds(2)).*dt - cp.pretime;
 
 end % on function

@@ -1,4 +1,4 @@
-function [ Z, X, Y ] = radpplot(str,dip,rak,psvsh,fign,subp);
+function [ Z, X, Y ] = radpplot(str,dip,rak,psvsh,fign,subp)
 % [ Z, X, Y ] = radpplot(str,dip,rak,psvsh,fign,subp)
 % This script plots the radiation pattern for the input fault geometry and
 % the given phase. If no phase is given, does P
@@ -54,7 +54,7 @@ R = radpcalc(str,dip,rak,r2d(az(iz)),r2d(inc));
 Z(iz,:,:) = R;
 end    
 %% make nodal planes
-% consider a set of 181 vectors spaced 1degree apart in the nodal plane,
+% consider a set of 181 vectors spaced 1 degree apart in the nodal plane,
 % making an angle alpha with the direction of the strike, with positive
 % alpha dipping to -Z. can work out the dip of these vectors 
 %   D = asin(sin(alpha)*sin(dip1))
@@ -80,9 +80,8 @@ slipv = [ cosd(rak)*cosd(str) + sind(rak)*cosd(dip)*sind(str);
 str1 = d2r(str);
 dip1 = d2r(dip);
 
-dip2 = acos(sind(rak)*sind(dip));
-% str2 = d2r(str - acosd(-1/(tand(dip)*tan(dip2))));
 str2 = mod(atan2(slipv(1),slipv(2)),2*pi);
+dip2 = 0.5*pi - asin(-slipv(3));
 if dip2 > pi/2
     dip2 = pi - dip2;
     str2 = pi + str2;
@@ -98,21 +97,29 @@ D1   = asin(sin(faz).*sin(dip1));
 phi1 = atan(tan(faz).*cos(dip1));
 x1_ = sin(phi1).*(cos(D1/2) - sin(D1/2))*rmax; x1_ = [x1_  fliplr(x1_(1:end-1))];
 y1_ = cos(phi1).*(cos(D1/2) - sin(D1/2))*rmax; y1_ = [y1_ -fliplr(y1_(1:end-1))];
-x1 = cos(str1)*x1_ + sin(str1)*y1_;
+x1 =  cos(str1)*x1_ + sin(str1)*y1_;
 y1 = -sin(str1)*x1_ + cos(str1)*y1_;
 % points for aux. plane
 D2   = asin(sin(faz).*sin(dip2));
 phi2 = atan(tan(faz).*cos(dip2));
 x2_ = sin(phi2).*(cos(D2/2) - sin(D2/2))*rmax; x2_ = [x2_  fliplr(x2_(1:end-1))];
 y2_ = cos(phi2).*(cos(D2/2) - sin(D2/2))*rmax; y2_ = [y2_ -fliplr(y2_(1:end-1))];
-x2 = cos(str2)*x2_ + sin(str2)*y2_;
+x2 =  cos(str2)*x2_ + sin(str2)*y2_;
 y2 = -sin(str2)*x2_ + cos(str2)*y2_;      
 
 % edge
 x3 = rmax.*cos(az);
 y3 = rmax.*sin(az);
 
-figure(fign);
+% takeoff angles
+incshow = [5,10,20,30];
+for ii = 1:length(incshow)
+    xi(:,ii) = rmax.*(sind(incshow(ii)/2)/sind(45))*cos(az);
+    yi(:,ii) = rmax.*(sind(incshow(ii)/2)/sind(45))*sin(az);
+end
+
+%% plot whole thing up
+figure(fign); set(gcf,'position',[10 10 800 600]); clf
 subplot(subp(1),subp(2),subp(3));
 pcolor(X,Y,-Z(:,:,psvsh))
 caxis([-0.5 0.5])
@@ -120,11 +127,15 @@ colormap(redbluecmap)
 shading interp
 axis equal
 box off; axis off
-text(0,4.5,sprintf('%s radiation pattern',upper(char(phases(psvsh)))),'Fontsize',14,'HorizontalAlignment','center')
+text(0,4.4,sprintf('\\textbf{%s radiation pattern}',upper(char(phases(psvsh)))),...
+    'Fontsize',18,'HorizontalAlignment','center','interpreter','latex' )
 hold on
 plot(x1,y1,'k','LineWidth',2)
 plot(x2,y2,'k','LineWidth',2)
 plot(x3,y3,'k','LineWidth',3)
+for ii = 1:length(incshow)
+    plot(xi(:,ii),yi(:,ii),':k','LineWidth',1)
+end
 
 end
 

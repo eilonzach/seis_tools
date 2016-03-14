@@ -16,17 +16,25 @@ function [ Ru,Tu ] = unsplit( Rs, Ts, phi, dT, samprate, inipol )
 %  OUTPUTS
 %   Rs      - Nx1 vector of unsplit radial component
 %   Ts      - Nx1 vector of unsplit tangential component
-  
-daz = phi-inipol;
 
-[ datFS ] = rot_traces( [Rs,Ts], daz);
-sampshift = round(dT.*samprate./2);
+RR = Rs;
+TT = Ts;
+
+for ii = 1:length(phi)
+daz = phi(ii)-inipol;
+
+[ datFS ] = rot_traces( [RR,TT], daz);
+sampshift = round(dT(ii).*samprate./2);
 datF = [zeros(sampshift,1);datFS(1:end-sampshift,1)];
 datS = [datFS(sampshift+1:end,2);zeros(sampshift,1)];
 [ datRT2 ] = rot_traces( [datF,datS], -daz);
+RR = datRT2(:,1);
+TT = datRT2(:,2);
+end
 
-Ru = datRT2(:,1);
-Tu = datRT2(:,2);
+Ru = RR;
+Tu = TT;
+
 
 %% Junk used while testing...
 % samprate= 50;

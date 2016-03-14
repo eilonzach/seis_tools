@@ -116,6 +116,9 @@ upw = sqrt( nstas/( mean(acor(iy).^2) + mean(acor(ix).^2) ) ); %   <<== UPWEIGHT
 % decide weights are by acor
 gamma = sqrt(( trace(A) - nstas - upw.^2*mean(acor(iy).^2)*trace(Y) ) / ...
                 (mean(acor(ix).^2)*trace(X) ));
+            
+gamma=1; upw=1;
+            
 wt = [gamma*acor(ix); upw*acor(iy); 1];
 Wd = diag(wt.^2);
 
@@ -179,42 +182,54 @@ acorNE = acor(handshake(nstas)*2 + (1:nstas));
 %% Plot
 if (plotopt>0) 
     
+
+taperx = 0.2;
+winx = ((npts-1)*dt)/(1 + 4*taperx);
+posttime = winx - pretime;
+
 figure(plotopt), clf
-set(gcf,'pos',[0 350 1050 450])
+set(gcf,'Position',[500  220  1000  500])
 tt0=dt.*(0:(npts-1))-pretime;
+xlims = [-pretime - 0.75*taperx*winx, posttime + pretime + 0.75*taperx*winx];
 
 for is=1:nstas
-    subplot(2,3,1); hold on
+    subplot(2,3,1); hold on; prettyplot('Pre-alignment North',xlims,'')
     plot(tt0-mean([dtN;dtE]),datNE(:,is,1),'b','Linewidth',1.5);
-    title('Pre-alignment North'), xlim([-7 13]), set(gca,'FontSize',7)
     
-    subplot(2,3,4); hold on
+    subplot(2,3,4); hold on; prettyplot('Post-alignment North',xlims,'')
     plot(tt0-dtN(is),datNE(:,is,1),'b','Linewidth',1.5);
-    title('Post-alignment North'), xlim([-7 13]), set(gca,'FontSize',7)
     
-    subplot(2,3,2); hold on
+    subplot(2,3,2); hold on; prettyplot('Pre-alignment East',xlims,'')
     plot(tt0-mean([dtN;dtE]),datNE(:,is,2),'c','Linewidth',1.5);
-    title('Pre-alignment East'), xlim([-7 13]), set(gca,'FontSize',7)
     
-    subplot(2,3,5); hold on
+    subplot(2,3,5); hold on; prettyplot('Post-alignment East',xlims,'Time (s)')
     plot(tt0-dtE(is),datNE(:,is,2),'c','Linewidth',1.5);
-    title('Post-alignment East'), xlim([-7 13]), set(gca,'FontSize',7)
     
-    subplot(2,3,3); hold on
-    plot(tt0-mean([dtN;dtE]),datNE(:,is,1),'b','Linewidth',1);
-    plot(tt0-mean([dtN;dtE]),datNE(:,is,2),'c','Linewidth',1);
-    title('Pre-alignment N vs E'), xlim([-7 13]), set(gca,'FontSize',7)
+    subplot(2,3,3); hold on; prettyplot('Pre-alignment N vs E',xlims,'')
+    plot(tt0-mean([dtN;dtE]),datNE(:,is,1),'b','Linewidth',1.5);
+    plot(tt0-mean([dtN;dtE]),datNE(:,is,2),'c','Linewidth',1.5);
     
-    subplot(2,3,6); hold on
-    plot(tt0-dtN(is),datNE(:,is,1),'b','Linewidth',1);
-    plot(tt0-dtE(is),datNE(:,is,2),'c','Linewidth',1);
-    title('Post-alignment N vs E'), xlim([-7 13]), set(gca,'FontSize',7)
+    subplot(2,3,6); hold on; prettyplot('Post-alignment N vs E',xlims,'')
+    plot(tt0-dtN(is),datNE(:,is,1),'b','Linewidth',1.5);
+    plot(tt0-dtE(is),datNE(:,is,2),'c','Linewidth',1.5);
 end
 
-subplot(2,3,4);  plot((tstak*dt)-2*pretime,stakN,'r','Linewidth',1)
-subplot(2,3,5);  plot((tstak*dt)-2*pretime,stakE,'r','Linewidth',1)
+subplot(2,3,4);  plot((tstak*dt)-2*pretime,stakN,'--r','Linewidth',1.5)
+subplot(2,3,5);  plot((tstak*dt)-2*pretime,stakE,'--r','Linewidth',1.5)
+subplot(2,3,6);  plot((tstak*dt)-2*pretime,stakN,'--r','Linewidth',1.5)
+subplot(2,3,6);  plot((tstak*dt)-2*pretime,stakE,'--r','Linewidth',1.5)
 
 
 end % on plotopt
 
 end
+
+function prettyplot(tstr,xlims,xlbstr)
+    title(['\textbf{',tstr,'}'],'interpreter','latex','FontSize',20,'FontWeight','bold'), 
+    xlim(xlims)
+    ylim([-3.5 3.5])
+    set(gca,'FontSize',14)
+    xlabel(['\textit{',xlbstr,'}'],'FontSize',18,'interpreter','latex')
+%     ylabel(ylbstr,'FontSize',14,'FontWeight','italic','interpreter','latex')
+end
+
