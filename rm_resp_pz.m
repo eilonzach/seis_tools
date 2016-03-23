@@ -59,7 +59,8 @@ hpfiltfrq=( ((w./lo_w).^(2*npoles_myfilt))./(1+(w./lo_w).^(2*npoles_myfilt)) );
 norm_trans=hpfiltfrq./resp;    % this is normalization transfer function
 norm_trans(isnan(norm_trans)) = 0;
 
-Need to put on a low-pass filter for the high end stuff!
+% Option to put on a low-pass filter for the high end stuff?! Prob not
+% needed.
 
 
 fftdata = fft(data);
