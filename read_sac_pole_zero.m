@@ -1,4 +1,5 @@
-function [zz,pp,constant] = read_sac_pole_zero(pole_zero_file_name)
+function [zz,pp,constant,unit] = read_sac_pole_zero(pole_zero_file_name)
+%  [zz,pp,constant,unit] = read_sac_pole_zero(pole_zero_file_name)
 % function to read a sac pole zero file
 % Written by Helen Janiszewski, 2015
 % 
@@ -56,6 +57,10 @@ function [zz,pp,constant] = read_sac_pole_zero(pole_zero_file_name)
             %assume first line is ZEROS nzeros
 %           tmp = sscanf(buff, '%s" "%d');
             if (strcmp(buff(1),'*'))
+                if strcmp(buff(3:7),'INPUT')
+                    unit = strtok(buff,'* INPUT UNIT        : ');
+                    unit = unit(~isspace(unit));
+                end
             elseif (strcmp(buff(1),'#'))
             elseif (strcmp(buff(1),'%'))
             elseif strcmp(buff(1), 'Z')

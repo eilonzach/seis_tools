@@ -1,4 +1,4 @@
-function [ datwf,datf,datwc,datc,fdeets,ttws,tts ] = data_clean( traces,cleaning_parm )
+function [ datwf,datf,datwc,datc,fdeets,ttws,tts ] = data_clean( traces,cleaning_parm,model )
 % [ datwf,datf,datwc,datc,fdeets,ttsw,tts ] = data_clean( traces,cleaning_parm )
 %Function to clean (detrend etc.) filter and window data from N stations
 % Taper and window chosen so that prex=0, postx=10, taperx = 0.1 will be
@@ -29,6 +29,7 @@ function [ datwf,datf,datwc,datc,fdeets,ttws,tts ] = data_clean( traces,cleaning
 %  tts     = vector of times for unfiltered, unwindowed, clean traces
 %
 % Written by Z. Eilon 08/2015
+
 cp = cleaning_parm;
 
 nsta = size(traces,2);
@@ -46,8 +47,18 @@ flo = cp.flo;
 fhi = cp.fhi;
 
 fdeets = [fhi flo cp.npoles];
+ffund = 1./(npt.*dt);
 % option 1: butter
-[bb,aa]=butter(cp.npoles, [flo, fhi].*dt.*2);
+if flo > ffund && fhi.*dt.*2<1
+    [bb,aa]=butter(cp.npoles, [flo, fhi].*dt.*2);
+elseif flo > ffund && fhi.*dt.*2==1
+    [bb,aa]=butter(cp.npoles, flo.*dt.*2,'high');
+elseif  flo<=ffund && fhi.*dt.*2<1
+    [bb,aa]=butter(cp.npoles, fhi.*dt.*2,'low');
+elseif  flo<=ffund && fhi.*dt.*2==1
+    datf = traces;
+    return
+end
 % option 2: cheby
 [bb,aa]=cheby1(cp.npoles,0.5, [flo, fhi].*dt.*2);
 % option 3: higher order butter
@@ -73,8 +84,9 @@ for is=1:nsta
     % mn=nanmean(rec(isfi));    % Deal with NaNs
     % inan=find(isnan(rec)); % find NaNs
     nnan=find(~isnan(rec)); % find not-NaNs
+    if isempty(nnan), datwf(:,is) = NaN; continue, end
     % rec(nnan)=rec(nnan)-mn; % take off mean 
-    rec(nnan)=detrend(rec(nnan)); % detrend not-nans
+%     rec(nnan)=detrend(rec(nnan)); % detrend not-nans
     rec(isnan(rec))=0; %set NaNs to zero
     wdo1 = [zeros(nnan(1)-1,1);tukeywin(length(nnan),2*cp.taperx);zeros(length(rec)-nnan(end),1)];
     rec = rec.*wdo1; % first taper of whole window. Sets NaNs to zero and tapers end of non-NaN
@@ -86,10 +98,16 @@ for is=1:nsta
     datc(:,is)=rec;
     
     % window
+    if nargout>2
+    try
     recw=rec.*wdo2;
     datwc(:,is)=recw(jbds);
+    catch
+        save('traces','traces'),save('cp','cp'),try save('model','model');end
+    end
+    end
 
-    %% Build xcorr data
+    %% Filtered data
     % pad with plenty of zeros for the filter
     rec = [zeros(1000,1);rec;zeros(1000,1)]; 
         % option 1: filter with phase
@@ -99,7 +117,11 @@ for is=1:nsta
     % lop off padding
     recf = recf(1001:end-1000);
 
+    % detrend again
+    recf = detrend(recf);
+
     datf(:,is)=recf;
+    
 
     % window
     recwf=recf.*wdo2;
@@ -113,7 +135,7 @@ for is=1:nsta
 
 end % stas loop
 
-tts =  (0:(npt-1)).*dt - cp.pretime;
-ttws = (ibds(1):ibds(2)).*dt - cp.pretime;
+tts =  (0:(npt-1)).*dt - cp.pretime;        tts = tts(:);  % columnise
+ttws = (ibds(1):ibds(2)).*dt - cp.pretime;  ttws = ttws(:); % columnise
 
 end % on function

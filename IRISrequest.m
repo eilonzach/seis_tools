@@ -1,8 +1,8 @@
 % Script to make a request file to send to breq_fast to get IRIS data, by
 % specifying a station and event parameters - uses irisFetch tools
-% ? If 'dataype' is set properly, will automatically send file to IRIS
-% ? Uses all stations in antelope db (unless explicitly told to ignore)
-% ? Uses all events that conform to set criteria
+% - If 'dataype' is set properly, will automatically send file to IRIS
+% - Uses all stations in antelope db (unless explicitly told to ignore)
+% - Uses all events that conform to set criteria
 % requires site and origin tables
 
 label='EilonPMGdata'; % also name of outfile
@@ -10,8 +10,8 @@ label='EilonPMGdata'; % also name of outfile
 % station specifications
 chans='BH?'; % e.g. BHE BHN BHZ or ? as a wildcard for any spot
 nchans=3;
-network='IU';
-dostas={'ANMO'};
+network='_OBSIP';
+dostas={'*'};
 ignorestas={'BBU1','KIR1','ESA1','SEHA','MGO','MISA'}; % list of stations to ignore
 
 % data type to request - if no match, sends to me
