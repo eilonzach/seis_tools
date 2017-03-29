@@ -1,0 +1,86 @@
+This folder contains the tools you should need to make BREQ_FAST requests 
+through MATLAB. 
+
+SOME THINGS YOU WILL NEED TO DO FIRST:
+
+==========================================================================
+==========================================================================
+
+
+====================  A) ADD PATH  ====================
+
+Make sure the ...breqfasting/matguts/ folder is on your MATLAB path:
+
+> addpath('/path/to/breqfasting/matguts')
+
+====================  B) EMAIL SETUP  ====================
+
+IF YOU USE GMAIL, YOU MAY GET AN ERROR DURING THIS PROCESS - SEE BELOW
+
+The first thing to do, if you have never set up your MATLAB to send emails before, is to run:
+
+> help email_matlab_setup
+
+which will give you some instructions on how to set up your email using:
+
+> email_matlab_setup(email_address,outgoing_smtp_server)
+
+Where you obviously replace 'email_address' with your actual address (as a string) and 'outgoing_smtp_server' with the smtp server, which is 'smtp.gmail.com' if you are using the @brown.edu mail. 
+
+N.B. at this point, you may get an error, followed by an email from google saying that an app is trying to sign into your email, and you will have to give it permission and run the email_matlab_setup() again. If you don't like the idea of that, then fair enough, you just won't be able to have MATLAB send the actual email - it will just prepare the request file that you will have to manually copy into the text of an email. 
+
+====================  C) RDSEED SETUP  ====================
+
+The next thing to check is that you have rdseed downloaded and compiled on your machine. Go to a Terminal window and try
+
+$>  rdseed -h
+
+If you get a load of output, you're in good shape. Now you need to make sure that rdseed (or a symbolic link to it) is sitting in your /usr/local/bin/ folder. 
+
+No big deal if it isn't, or if you don't want to put it there, just change the relevant lines in breq_fast_process:
+    system(sprintf('/usr/local/bin/rdseed -f %s -p',file_name{ii}))
+    system(sprintf('/usr/local/bin/rdseed -f %s -d',file_name{ii}))
+to point to the correct path to your rdseed executable. 
+
+====================  D) SEIZMO  ====================
+
+There is a nice package for people that do lots of seismology things using MATLAB, called seizmo. 
+
+Go to http://epsc.wustl.edu/~ggeuler/codes/m/seizmo/
+
+and downlowad the package. Drag it to your MATLAB folder and put it somewhere prominent - you'll likely use some of these tools in future once you've explored them. For now, run 
+
+> startup_seizmo.m 
+
+in MATLAB, which will add the seizmo goodies to your MATLAB path. 
+
+
+==========================================================================
+==========================================================================
+
+Now you're ready to go. Try running the EXAMPLE.m script. 
+
+The BREQ_FAST_ing is in two parts:
+
+1) breq_fast_request.m = the request
+2) breq_fast_process.m = the downloading and processing
+
+After part (1), the IRIS DMC will take some time to process your request. Once they send you a confirmation email, you can move on to part (2). Your normal workflow will proabbaly be to runpart (1), wait some time (IRIS will send you an email when the data is ready), and then run part (2).
+
+In case you're wondering, what breq_fast_process.m does to get the data is:
+- open an ftp link
+- download the data into a new folder (actually, it downloads the most 
+  recent data file with the label that you specify. So if you don't change 
+  labels between requests, just know that it will always be grabbing the 
+  most recent file with that label...!)
+- open up the .SEED file into separate SAC files and response files
+- read in those files and convert them to MATLAB trace structures (along 
+  with their corresponding response data in poles and zeros)
+- delete the data files (although they're still sitting on the DMC ftp 
+  server if you want them again). 
+No data is saved locally. You can do that afterwards by saving the 'traces' 
+structure. 
+
+If you find this tool useful and/or have any comments or suggested improvements, please email me at eilon@geol.ucsb.edu.
+
+Zach Eilon, March 2017

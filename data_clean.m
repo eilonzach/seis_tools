@@ -136,6 +136,6 @@ for is=1:nsta
 end % stas loop
 
 tts =  (0:(npt-1)).*dt - cp.pretime;        tts = tts(:);  % columnise
-ttws = (ibds(1):ibds(2)).*dt - cp.pretime;  ttws = ttws(:); % columnise
+ttws = ([ibds(1):ibds(2)]-1).*dt - cp.pretime;  ttws = ttws(:); % columnise
 
 end % on function
