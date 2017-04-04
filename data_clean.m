@@ -16,6 +16,7 @@ function [ datwf,datf,datwc,datc,fdeets,ttws,tts ] = data_clean( traces,cleaning
 %     cleaning_parm.taperx   = proportion of trace that is taper (each end)
 %     cleaning_parm.fhi      = high bp freq.
 %     cleaning_parm.flo      = low bp freq.
+%     cleaning_parm.filtopt      = low bp freq.
 %     cleaning_parm.npoles   = number of poles for filter
 %     cleaning_parm.norm     = whether (1) or not (0) to normalise traces by std
 %
@@ -41,29 +42,29 @@ dt = 1./cp.samprate;
 fmin = cp.samprate/npt;
 fmax = 0.5/dt;
 % edit filter frequencies in case they don't work...
-flo = max([cp.flo,fmin]); %max period can't be longer than window length
-fhi = min([cp.fhi,fmax]); %min period can't be shorter than Nyquist period
+% flo = max([cp.flo,fmin]); %max period can't be longer than window length
+% fhi = min([cp.fhi,fmax]); %min period can't be shorter than Nyquist period
 flo = cp.flo;
 fhi = cp.fhi;
 
 fdeets = [fhi flo cp.npoles];
-ffund = 1./(npt.*dt);
-% option 1: butter
-if flo > ffund && fhi.*dt.*2<1
-    [bb,aa]=butter(cp.npoles, [flo, fhi].*dt.*2);
-elseif flo > ffund && fhi.*dt.*2==1
-    [bb,aa]=butter(cp.npoles, flo.*dt.*2,'high');
-elseif  flo<=ffund && fhi.*dt.*2<1
-    [bb,aa]=butter(cp.npoles, fhi.*dt.*2,'low');
-elseif  flo<=ffund && fhi.*dt.*2==1
-    datf = traces;
-    return
-end
-% option 2: cheby
-[bb,aa]=cheby1(cp.npoles,0.5, [flo, fhi].*dt.*2);
-% option 3: higher order butter
-[z,p,k]=butter(cp.npoles, [flo, fhi].*dt.*2.);
-[sos,g]=zp2sos(z,p,k); bb=sos; aa=g;
+% ffund = 1./(npt.*dt);
+% % option 1: butter
+% if flo > ffund && fhi.*dt.*2<1
+%     [bb,aa]=butter(cp.npoles, [flo, fhi].*dt.*2);
+% elseif flo > ffund && fhi.*dt.*2==1
+%     [bb,aa]=butter(cp.npoles, flo.*dt.*2,'high');
+% elseif  flo<=ffund && fhi.*dt.*2<1
+%     [bb,aa]=butter(cp.npoles, fhi.*dt.*2,'low');
+% elseif  flo<=ffund && fhi.*dt.*2==1
+%     datf = traces;
+%     return
+% end
+% % option 2: cheby
+% [bb,aa]=cheby1(cp.npoles,0.5, [flo, fhi].*dt.*2);
+% % option 3: higher order butter
+% [z,p,k]=butter(cp.npoles, [flo, fhi].*dt.*2.);
+% [sos,g]=zp2sos(z,p,k); bb=sos; aa=g;
 
 %% Make the taper window
 % WAS nwin=round((cp.postx+cp.prex)/dt)+1; % window length in samples
@@ -108,14 +109,15 @@ for is=1:nsta
     end
 
     %% Filtered data
-    % pad with plenty of zeros for the filter
-    rec = [zeros(1000,1);rec;zeros(1000,1)]; 
-        % option 1: filter with phase
-        % recf=filter(bb, aa, rec);
-    % zerophase bandpass filter & window
-    recf=filtfilt(bb, aa, rec);
-    % lop off padding
-    recf = recf(1001:end-1000);
+%     % pad with plenty of zeros for the filter
+%     rec = [zeros(1000,1);rec;zeros(1000,1)]; 
+%         % option 1: filter with phase
+%         % recf=filter(bb, aa, rec);
+%     % zerophase bandpass filter & window
+%     recf=filtfilt(bb, aa, rec);
+%     % lop off padding
+%     recf = recf(1001:end-1000);
+    recf = filt_quick(rec,flo,fhi,dt,cp.npoles);
 
     % detrend again
     recf = detrend(recf);
