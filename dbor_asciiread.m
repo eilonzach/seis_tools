@@ -18,7 +18,16 @@ elats = A{1};
 elons = A{2};
 edeps = A{3};
 evtimes = A{4};
-mags = A{16};
+
+Mbs = A{14};
+Mws = A{16};
+
+if unique(Mws)==-999 
+    mags = Mbs;
+else
+    mags = Mws;
+end
+
 
 end
 

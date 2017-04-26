@@ -54,7 +54,7 @@ if isempty(label)
     label = [usr,'_request_',datestr(now,'yyyymmddHHMM')];
 end
 if isempty(locs)
-    locs = '00';
+    locs = '';
 end
 
 if nargin < 9 || isempty(datatype)

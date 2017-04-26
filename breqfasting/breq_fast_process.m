@@ -66,7 +66,9 @@ end
 if ~exist('SEED_file_name','var')
     close(ftpobj)
     cd(wd);
-    error('SEED file not on server yet'); 
+    fprintf('SEED file not on server yet\n'); 
+    traces = [];
+    return
 end
 
 fprintf('   downloading %s\n',SEED_file_name)

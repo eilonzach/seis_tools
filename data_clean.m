@@ -104,6 +104,7 @@ for is=1:nsta
     recw=rec.*wdo2;
     datwc(:,is)=recw(jbds);
     catch
+        fprintf('ERROR WITH WINDOWING IN DATA CLEAN\n')
         save('traces','traces'),save('cp','cp'),try save('model','model');end
     end
     end
@@ -125,9 +126,16 @@ for is=1:nsta
     datf(:,is)=recf;
     
 
-    % window
+     % window
+    if nargout>2
+    try
     recwf=recf.*wdo2;
     datwf(:,is)=recwf(jbds);
+    catch
+        fprintf('ERROR WITH WINDOWING IN DATA CLEAN\n')
+        save('traces','traces'),save('cp','cp'),try save('model','model');end
+    end
+    end
     
     % normalize
     if cp.norm==1
