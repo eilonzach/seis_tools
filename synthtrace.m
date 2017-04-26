@@ -1,1 +1,0 @@
-/Users/zeilon/Documents/MATLAB/myFUNCTIONS/synthtrace.m
