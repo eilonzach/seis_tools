@@ -115,7 +115,7 @@ vtemp = [mean([Vdto,Vdbo],2);vlay];
 vlay = vtemp(isort);
 
 %% any seds/surface?
-if zlayt(1)~=0
+if zlayt(1)~=0 && length(dind)==2; % only account for sed layer if two discontinuities
     zsb = zlayt(1);
     zlayt = [0;zsb/2;zlayt];
     zlayb = [zsb/2;zsb;zlayb];

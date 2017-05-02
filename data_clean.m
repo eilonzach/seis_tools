@@ -75,6 +75,7 @@ ibds=[max(1,n1-floor(nwin*2*cp.taperx)), min(npt,n1+nwin+floor(nwin*2*cp.taperx)
 jbds=ibds(1):ibds(2); % indices of points to keep
 
 datwf=zeros((ibds(2)-ibds(1)+1), nsta);
+datwc=zeros((ibds(2)-ibds(1)+1), nsta);
 datf=zeros(size(traces));
 datc=zeros(size(traces));
 
@@ -126,15 +127,13 @@ for is=1:nsta
     datf(:,is)=recf;
     
 
-     % window
-    if nargout>2
+    % window
     try
     recwf=recf.*wdo2;
     datwf(:,is)=recwf(jbds);
     catch
         fprintf('ERROR WITH WINDOWING IN DATA CLEAN\n')
         save('traces','traces'),save('cp','cp'),try save('model','model');end
-    end
     end
     
     % normalize
