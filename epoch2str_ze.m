@@ -7,6 +7,12 @@ function [ str ] = epoch2str_ze( epochaltime,strformat )
 % 
 % Z. Eilon, April 2017
 
+if nargin < 2 || isempty(strformat)
+    strformat = '%Y-%m-%d %H:%M:%S';
+end
+
+
+
 serialtime = epoch2serial_ze(epochaltime);
 
 % get strformat from epoch2str format into datestr format

@@ -173,9 +173,9 @@ if size(traces,1)~=Nreq
 end
 
 cd(wd);
+pause(0.1);
 if ifdelete
-rmdir('temp_dir','s');
-
+    rmdir('temp_dir','s');
 end
 
 end

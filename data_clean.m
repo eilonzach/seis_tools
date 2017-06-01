@@ -122,7 +122,7 @@ for is=1:nsta
     recf = filt_quick(rec,flo,fhi,dt,cp.npoles);
 
     % detrend again
-    recf = detrend(recf);
+%     recf = detrend(recf);
 
     datf(:,is)=recf;
     

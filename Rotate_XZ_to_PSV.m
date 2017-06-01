@@ -7,7 +7,6 @@ function [P,SV] = Rotate_XZ_to_PSV(X,Z,VpSurf,VsSurf,RP)
     % (i.e., Kennett [1991] and Bostock [1998])
     %
     % !! NOTE !! Z in this equation is positive down !!
-    % We simply make Z_comp_sac (above) negative
 
     a   = VpSurf;
     b   = VsSurf;
@@ -19,7 +18,7 @@ function [P,SV] = Rotate_XZ_to_PSV(X,Z,VpSurf,VsSurf,RP)
     C   = (0.5-(b^2)*(RP^2))/(b*qb);
     D   = RP*b;
 
-    P  = A*X+B*Z;
-    SV = C*X+D*Z;
+    P  = A*X + B*Z;
+    SV = C*X + D*Z;
 
 end
