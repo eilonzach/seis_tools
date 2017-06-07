@@ -15,11 +15,12 @@ function [phiSC,dTSC, Ru, Tu, Emap, inipolest,phiEV,dTEV,Lmap] = SC_unsplit( dat
 %     Tu        = time series of unsplit data on T component
 %     Emap      = energy map from grid search (Min Energy method)
 %     inipolest = estimated initial polarisation of wave
+%  - if nargout ? 6 ignore this
 %     phiEV     = estimated fast direction of anisotropy (Eigenvalue method)
 %     dTEV      = estimated splitting time (Eigenvalue method)     
 %     Lmap      = eigenvalue map from grid search (Eigenvalue method)
 
-if nargin < 4;
+if nargin < 4
     plotopt = 0;
 end
 
@@ -41,9 +42,11 @@ for ip = 1:length(phis)
 for it = 1:length(dTs)
     [ Ru,Tu ] = unsplit( datRT(:,1), datRT(:,2), phis(ip), dTs(it), samprate, inipolest );
     Cu = [Ru'*Ru, Ru'*Tu; Tu'*Ru, Tu'*Tu];
-    [~,Du] = eigs(Cu);
-    Lmap(ip,it) = Du(2,2);
     Emap(ip,it) = Cu(2,2);
+    if nargout>6 % if also doing EV method
+        [~,Du] = eigs(Cu);
+        Lmap(ip,it) = Du(2,2);
+    end
 end
 end
 
@@ -51,11 +54,13 @@ end
 [~,it,ip] = mingrid(Emap);
 phiSC = phis(ip);
 dTSC = dTs(it);
-%Eigenvalue method
-[~,it2,ip2] = mingrid(Lmap);
-phiEV = phis(ip2);
-dTEV = dTs(it2);
 
+%Eigenvalue method
+if nargout>6 
+    [~,it2,ip2] = mingrid(Lmap);
+    phiEV = phis(ip2);
+    dTEV = dTs(it2);
+end
 
 [ Ru,Tu ] = unsplit( datRT(:,1), datRT(:,2), phiSC, dTSC, samprate, inipolest );
 
