@@ -39,6 +39,7 @@ end
 N = length(phis);
 
 for ii=1:N-1
+    % starts in RT
     [rdat,tdat] = split1layer(idat1,idat2,samprate,inipol,phis(ii),dtimes(ii),'RT');
     idat1=rdat;
     idat2=tdat;

@@ -18,6 +18,7 @@ function [ datwf,datf,datwc,datc,fdeets,ttws,tts ] = data_clean( traces,cleaning
 %     cleaning_parm.flo      = low bp freq.
 %     cleaning_parm.filtopt      = low bp freq.
 %     cleaning_parm.npoles   = number of poles for filter
+%     cleaning_parm.npass    = # of passes for filter: 1=causal, 2=acausal
 %     cleaning_parm.norm     = whether (1) or not (0) to normalise traces by std
 %
 % OUTPUTS
@@ -36,6 +37,8 @@ cp = cleaning_parm;
 nsta = size(traces,2);
 npt = size(traces,1);
 dt = 1./cp.samprate;
+
+if ~isfield(cp,'npass'), cp.npass = 2; end
 
 
 %% Build filters
@@ -119,7 +122,7 @@ for is=1:nsta
 %     recf=filtfilt(bb, aa, rec);
 %     % lop off padding
 %     recf = recf(1001:end-1000);
-    recf = filt_quick(rec,flo,fhi,dt,cp.npoles);
+    recf = filt_quick(rec,flo,fhi,dt,cp.npoles,cp.npass);
 
     % detrend again
 %     recf = detrend(recf);
