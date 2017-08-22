@@ -36,7 +36,7 @@ end
 % you can fiddle with these if you want to alter how it identifies
 % discontinuities or constant V regions, but these values should work fine
 % for you
-discgrad = 0.5; % gradients of more than 0.5 m/s per m are deemed discontinuities
+discgrad = 0.15; % gradients of more than 0.4 m/s per m are deemed discontinuities
 constgrad = 0.001; % gradients of less than 2 m/s per 1000m are deemed constant V
 
 
@@ -174,6 +174,7 @@ for iv = 1:length(varargin)
     ival = varargin{iv}; 
     ivaldo = ival(:);
     izdo = Z(:);
+   
     % do discs
     for id = 1:Ndisc
         ivaldto(id,1) = ivaldo(dind(di0(id)));
@@ -199,6 +200,14 @@ for iv = 1:length(varargin)
     end
     % first do surface
 %     fprintf('check surface layers being layerised ok..\n')
+    
+    % special dispensation for zero-layer sediments at the top
+    if find(Z==0,1,'last')>1
+        izdo(1:find(Z==0,1,'last')-1) = [];
+        ivaldo(1:find(Z==0,1,'last')-1) = [];
+        ival(1:find(Z==0,1,'last')-1) = [];
+    end
+    
     oval(1) = ival(1); % was oval(1:2)=ival(1:2);
     % now average within each layer
     for ilay = 2:length(vlay) % was ilay = 3:length(...

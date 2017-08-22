@@ -1,5 +1,5 @@
 function [ vp_est,vs_est,E_surf,vp_range,vs_range ] = surf_vp_vs_est( datZRT,tt,rayp,wind,ifplot)
-% [ vp_est,vs_est,E_surf,vp_range,vs_range ] = surf_vp_vs_est( datZRT,tt,rayp,windmifplot )
+% [ vp_est,vs_est,E_surf,vp_range,vs_range ] = surf_vp_vs_est( datZRT,tt,rayp,windmifplot,ifplot )
 % 
 %  Function to estimate the Vp and Vs values in the uppermost crust by grid
 %  searching through possible values of each parameter. 
@@ -35,7 +35,7 @@ for ip = 1:Np
     %condition on Vp/Vs ratio
     vpvs = vp_range(ip)/vs_range(is);
     if vpvs > 2,    continue; end
-    if vpvs < 1.50, continue; end
+    if vpvs < 1.40, continue; end
     if isempty(Rdat) || isempty(Zdat), continue; end
 
     [P,SV] = Rotate_XZ_to_PSV(Rdat,Zdat,vp_range(ip),vs_range(is),rayp);

@@ -1,5 +1,5 @@
-function card = write_cardfile( ofile,Z,vpv,vsv,rho,Qk,Qmu,vph,vsh,eta,tref ) %#ok<INUSL>
-% card = write_cardfile( ofile,Z,vp,vs,rho,[Qk=prem_value],[Qmu=prem_value],[vph=vpv],[vsh=vsv],[eta=1])
+function card = write_cardfile( ofile,Z,vpv,vsv,rho,Qk,Qmu,vph,vsh,eta,tref,minlaydz ) %#ok<INUSL>
+% card = write_cardfile( ofile,Z,vp,vs,rho,[Qk=prem_value],[Qmu=prem_value],[vph=vpv],[vsh=vsv],[eta=1],[tref=1],[minlaydz=20])
 %   
 % This function writes a cardfile - format to be used for (e.g.) MINEOS.
 % The function expects that you provide vp,vs,rho at a set of upper mantle
@@ -24,12 +24,14 @@ end
 if nargin < 11 || isempty(tref) 
     tref = 1;
 end
-
+if nargin < 12 || isempty(minlaydz) 
+    minlaydz = 20;
+end
 
 
 Re = 6371;
 gradz = 100; % thickness, in km, of region of linear grading between my model and PREM
-minlaydz = 20;
+% minlaydz = 20;
 
 %% Fields
 flds = {'rho','vpv','vsv','vph','vsh','Qk','Qmu','eta'};
