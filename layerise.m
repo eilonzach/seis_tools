@@ -36,7 +36,8 @@ end
 % you can fiddle with these if you want to alter how it identifies
 % discontinuities or constant V regions, but these values should work fine
 % for you
-discgrad = 0.15; % gradients of more than 0.4 m/s per m are deemed discontinuities
+% discgrad = 0.15; % gradients of more than 0.4 m/s per m are deemed discontinuities
+discgrad = 0.1; % gradients of more than 0.1 m/s per m are deemed discontinuities
 constgrad = 0.001; % gradients of less than 2 m/s per 1000m are deemed constant V
 
 

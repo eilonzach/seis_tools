@@ -29,6 +29,14 @@ if nargin < 12 || isempty(minlaydz)
 end
 
 
+global prem_anisotropic prem_isotropic
+if isempty(prem_isotropic)
+    prem_isotropic = prem;
+end
+if isempty(prem_anisotropic)
+    prem_anisotropic = prem_perfect('SPVW',0.25);
+end
+    
 Re = 6371;
 gradz = 100; % thickness, in km, of region of linear grading between my model and PREM
 % minlaydz = 20;
@@ -38,8 +46,7 @@ flds = {'rho','vpv','vsv','vph','vsh','Qk','Qmu','eta'};
 
 %% Grab PREM
 if isequal(vpv,vph) && isequal(vsv,vsh) && all(eta==1) % if totally isotropic
-    ifanis = 0;
-    prem_mod = prem;
+    prem_mod = prem_isotropic;
     % refine depths
     zz = prem_mod.depth;
     while any(diff(zz)>minlaydz)
@@ -51,9 +58,8 @@ if isequal(vpv,vph) && isequal(vsv,vsh) && all(eta==1) % if totally isotropic
     prem_mod.vpv = prem_mod.vp; prem_mod.vph = prem_mod.vp;
     prem_mod.vsv = prem_mod.vs; prem_mod.vsh = prem_mod.vs;
     prem_mod.eta = ones(size(prem_mod.depth));
-else
-    ifanis = 1;
-    prem_mod = prem_perfect('SPVW',0.5); % if anisotropic - slower!
+else % anisotropic!
+    prem_mod = prem_anisotropic; % if anisotropic - slower!
 end
 prem_mod.Qk = prem_mod.qk;
 prem_mod.Qmu = prem_mod.qu;
@@ -80,6 +86,7 @@ end
 card.depth = [Z;prem_mod.depth(igrad);prem_mod.depth(bgrad)];
 card.R = Re - card.depth;
 card.Qmu(isinf(card.Qmu) & card.depth>2500) = 0 ; % fix issue where linterp makes zero Qmu inf.
+card.Qmu(isnan(card.Qmu) & card.depth<10) = Inf ; % fix issue where linterp makes Inf Qmu nan.
 
 %% find node numbers
 N = length(card.R);
