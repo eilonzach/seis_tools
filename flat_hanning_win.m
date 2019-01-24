@@ -2,7 +2,7 @@ function windata = flat_hanning_win(taxis,data,winbgt,winendt,tapertime)
 % windata = flat_hanning_win(taxis,data,winbgt,winendt,tapertime)
 % function to apply a box-car window with a hanning taper end.
 % 
-% Written by H. Janiszewski
+% Written by Ge Jin
 % Adapted by Z. Eilon 04/2016
 
 if size(data,2)>size(data,1)

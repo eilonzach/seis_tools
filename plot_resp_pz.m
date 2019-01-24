@@ -1,5 +1,5 @@
 function plot_resp_pz( pp,zz,gain, fmin, fmax,extra_zp, fign )
-%plot_resp_pz( poles,zer0s,gain,[fmin],[fmax],[extra_zp])
+% plot_resp_pz( poles,zer0s,gain,[fmin],[fmax],[extra_zp])
 % function to plot instrument response from data given poles, zeros and gain
 % written by Z. Eilon -- 09/2015
 % 

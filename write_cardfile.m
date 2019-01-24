@@ -86,7 +86,8 @@ end
 card.depth = [Z;prem_mod.depth(igrad);prem_mod.depth(bgrad)];
 card.R = Re - card.depth;
 card.Qmu(isinf(card.Qmu) & card.depth>2500) = 0 ; % fix issue where linterp makes zero Qmu inf.
-card.Qmu(isnan(card.Qmu) & card.depth<10) = Inf ; % fix issue where linterp makes Inf Qmu nan.
+card.Qmu(isnan(card.Qmu) & card.depth<10) = 999 ; % fix issue where linterp makes Inf Qmu nan.
+card.Qmu(isinf(card.Qmu)) = 999 ; % fix issue where linterp makes Inf Qmu nan.
 
 %% find node numbers
 N = length(card.R);
@@ -111,5 +112,6 @@ for ii = 1:N
 end
 fclose(fid);
 end
+
 end
 

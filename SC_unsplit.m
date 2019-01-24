@@ -34,7 +34,7 @@ dphi = 2;
 [ datRT ] = zne2zrt( [datN,datE], inipolest );
 %% Grid search to unsplit
 phis = -90:dphi:90;
-dTs  =   0:ddT :5;
+dTs  =   0:ddT :4;
 Emap = zeros(length(phis),length(dTs)); % Minimum energy method
 Lmap = zeros(length(phis),length(dTs)); % Eigenvalue method
 

@@ -5,7 +5,7 @@ modname = textscan(fid,'%s\n',1);
 mdeets = fgetl(fid);
 discs = fgetl(fid);
 [nlay] = disc_vals(discs);
-MOD = textscan(fid,'%8.0f %8.2f %8.2f %7.2f %7.1f %7.1f %8.2f %7.2f %.4f %*[^\n]',nlay);
+MOD = textscan(fid,'%8.0f %8.2f %8.2f %7.2f %7.1f %7.1f %8.2f %7.2f %6.5f %*[^\n]',nlay);
 fclose(fid);
 
 model = struct( 'R',flipud(MOD{1}/1e3),...
@@ -17,7 +17,7 @@ model = struct( 'R',flipud(MOD{1}/1e3),...
                 'Qk',flipud(MOD{5}),...
                 'Qm',flipud(MOD{6}),...
                 'eta',flipud(MOD{9})); 
-model.eta = zeros(size(model.R));
+% model.eta = ones(size(model.R));
 model.Z = 6371 - model.R;
 
 [model.Vs,model.Vp]  = voigtav(model.Vsh,model.Vsv,model.Vph,model.Vpv,model.eta);

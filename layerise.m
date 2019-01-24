@@ -49,12 +49,32 @@ dv = diff(Vdo);
 grad = dv./dz;
 
 %% ---------------  DISCONTINUITIES  ---------------  %%
-dind = find(abs(grad) >= discgrad); % find discontinuities
-a = diff(dind);
-b = find([a;inf]>1);
-c = diff([0;b]);% length of sequences with discs
-di1 = cumsum(c); % end points of sequences with discs
-di0 = di1-c+1; % start points of sequences with discs
+dind = find(abs(grad) >= discgrad); % find all discontinuities (inc gradients)
+if isempty(dind),dind = find(abs(grad) >= 0.075);end % find all discontinuities (inc gradients)
+if isempty(dind),dind = find(abs(grad) == max(abs(grad)));end % find all discontinuities (inc gradients)
+dind0 = find(isinf(abs(grad))); % find absolute disontinuities (only flat ones)
+dind1 = setdiff(dind,dind0);
+
+%% clump discontinuities in strings. Fails if strong gradients near Moho
+if ~isempty(dind1)
+    a = diff(dind1);
+    b = find([a;inf]>1);
+    c = diff([0;b]);% length of sequences with discs
+    di1 = cumsum(c); % end points of sequences with discs
+    di0 = di1-c+1; % start points of sequences with discs
+    % re-sort indices back to full set of discontinuities)
+    [~,d1tod_,~] = intersect(dind,dind1);
+    di0 = d1tod_(di0);
+    di1 = d1tod_(di1);
+    % put abs discs back in
+    [~,d0tod_,~] = intersect(dind,dind0);
+    di0 = sort([d0tod_;di0]);
+    di1 = sort([d0tod_;di1]);
+else 
+    di0 = 1;di1 = 1;
+end
+    
+
 Ndisc = length(di0); % number of discontinuities
 
 Zdisc = zeros(Ndisc,1);
@@ -178,8 +198,8 @@ for iv = 1:length(varargin)
    
     % do discs
     for id = 1:Ndisc
-        ivaldto(id,1) = ivaldo(dind(di0(id)));
-        ivaldbo(id,1) = ivaldo(dind(di1(id))+1);
+        ivaldto(id,1) = ivaldo(dind(id));
+        ivaldbo(id,1) = ivaldo(dind(id)+1);
     end
     ivaldo(kill) = [];
     izdo(kill) = [];

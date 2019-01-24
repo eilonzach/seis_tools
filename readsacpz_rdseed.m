@@ -97,7 +97,7 @@ function [pz]=readsacpz_rdseed(varargin)
 % todo:
 
 % string input or files?
-addpath('/Users/zeilon/Documents/MATLAB/seizmo/time')
+% addpath('/Users/zeilon/Documents/MATLAB/seizmo/time')
 global SEIZMO
 if(nargin==2 && islogical(varargin{2}) && isscalar(varargin{2}) ...
         && varargin{2} && isstring_seizmo(varargin{1}))

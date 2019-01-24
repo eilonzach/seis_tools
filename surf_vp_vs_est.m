@@ -25,8 +25,8 @@ end
 
 
 %% grid search
-vp_range = [3. : 0.025 : 7.5]; Np = length(vp_range);
-vs_range = [1.5 : 0.04 : 4.7]; Ns = length(vs_range);
+vp_range = [3.  : 0.025 : 7.5]; Np = length(vp_range);
+vs_range = [1.3 : 0.04 : 4.1]; Ns = length(vs_range);
 
 E_surf = nan(Np,Ns);
 for is = 1:Ns
@@ -53,7 +53,7 @@ for ip = 1:Np
 end
 end
 % best guess
-[minE,x,y] = mingrid(E_surf);
+[~,x,y] = mingrid(E_surf);
 vs_est = vs_range(x);
 vp_est = vp_range(y);
 
