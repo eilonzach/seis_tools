@@ -1,6 +1,5 @@
 email_matlab_setup
 addpath('matguts');
-figure(1);clf; set(gcf,'pos',[97 369 1090 500]);
 %%
 
 
@@ -38,7 +37,7 @@ for itr = 1:length(tr)
 end
 
 %% plotting
-figure(1)
+figure(1);clf; set(gcf,'pos',[97 369 1090 500]);
 plot(tr(1).tt,tr(1).data);
 datetick('x',13)
 set(gca,'fontsize',14,'xlim',[tr(1).tt(5e4),tr(1).tt(end)])

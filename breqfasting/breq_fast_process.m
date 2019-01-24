@@ -53,6 +53,7 @@ usrname(isspace(usrname)) = '_';
 fprintf('   connecting to server\n')
 ftpobj = ftp('ftp.iris.washington.edu','anonymous','eilon@geol.ucsb.edu');
 cd(ftpobj,['pub/userdata/',usrname]);
+sf=struct(ftpobj);  sf.jobject.enterLocalPassiveMode();
 % parse to find SEED file that matches "label" and is most recent
 aa = dir(ftpobj);
 t0 = 0;
@@ -77,8 +78,8 @@ close(ftpobj)
 
 %% read the data with rdseed
 for ii = 1:length(file_name)
-    system(sprintf('/usr/local/bin/rdseed -f %s -p',file_name{ii}))
-    system(sprintf('/usr/local/bin/rdseed -f %s -d',file_name{ii}))
+    system(sprintf('/usr/local/bin/rdseed -f %s -p',file_name{ii})) % extract pole/zeros + metadata
+    system(sprintf('/usr/local/bin/rdseed -f %s -d',file_name{ii})) % extract data
 end
 
 

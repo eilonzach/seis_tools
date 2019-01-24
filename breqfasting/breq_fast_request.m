@@ -82,11 +82,11 @@ endtimes = datenum(endtimes);
 
 %% request details
 usrname(isspace(usrname)) = '_';
-institution = 'Brown University';
-snail_mail  = '324 Brook Street, Providence, RI 02912';
+institution = 'UC Santa Barbara';
+snail_mail  = '2116 Webb Hall, UCSB, Santa Barbara, CA 93106';
 e_mail      = getpref('Internet','E_mail');
-workphone   = '(845) 365-8460';
-workfax     = '(845) 365-8101';
+workphone   = '(805) 893-4688';
+workfax     = '(805) 893-2314';
 
 %% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %% SHOULDN'T NEED TO CHANGE ANYTHING BELOW HERE
