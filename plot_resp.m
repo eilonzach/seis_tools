@@ -1,5 +1,6 @@
 function plot_resp( resp,faxis,extra_zp )
-%% function to remove instrument response from data given poles, zeros and gain
+% plot_resp( resp,faxis,extra_zp )
+% function to plot instrument response from data given poles, zeros and gain
 % adapted by Zach Eilon from function written by Ge Jin, 2014/02/27
 % 
 % INPUTS 
