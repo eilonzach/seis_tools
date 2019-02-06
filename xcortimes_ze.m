@@ -64,15 +64,19 @@ nsta=size(data,2);
 npt=size(data,1);
 nmat=nsta*(nsta-1)/2; % total number of combinations of statinos
 
-% Gmat=sparse(nmat+1,nsta);
+% Gmat=sparse(nmat,nsta);
 % sparse G matrix making
-si = zeros(nmat+1,1);
-sj = zeros(nmat+1,1);
-ss = zeros(nmat+1,1);
+si = zeros(nmat,1);
+sj = zeros(nmat,1);
+ss = zeros(nmat,1);
 
-avec=zeros(nmat+1,1);
-wvec=ones(nmat+1,1);
+avec=zeros(nmat,1);
+wvec=ones(nmat,1);
 lmax=round(lagmax./dt);   % Max lag allowed, should set in fcn
+
+% groups of stations
+Ngrp = 1;
+grps = cell({});
 
 kk=0;
 %if (iplot==1) disp('building lag matrix...'); end
@@ -84,6 +88,7 @@ for ii=1:(nsta-1) % for each station...
                 continue 
             end
         end
+        % do xcorr
         kk=kk+1;
         [c,lags]=xcorr(data(:,ii),data(:,jj),lmax,scaleopt);
         pk=find(c==max(c));
@@ -93,29 +98,88 @@ for ii=1:(nsta-1) % for each station...
         sj(2*kk+[-1,0]) = [ii jj];  % j indices of G
         ss(2*kk+[-1,0]) = [1 -1];  % j indices of G
         
+        % assign to groups
+        if kk == 1, grps{1}(1)=ii; end
+        for ig = 1:Ngrp
+            if ismember(ii,grps{ig})
+                % ii is in group ig; assign jj to that group and get out
+                grps{ig} = unique([grps{ig};jj]);
+                break 
+            end
+            if ismember(jj,grps{ig})
+                % jj is in group ig; assign ii to that group and get out
+                grps{ig} = unique([grps{ig};ii]);
+                break 
+            end
+            % if at this point, ii and jj are in no group, make a new group
+            Ngrp = Ngrp+1;
+            grps{Ngrp} = [ii;jj];
+        end
+        
 %         Gmat(kk,ii) = 1;
 %         Gmat(kk,jj) = -1;
     end
 end
 % adjust vectors for non-pairs
-avec = avec(1:kk+1);
-wvec = wvec(1:kk+1);
+avec = avec(1:kk);
+wvec = wvec(1:kk);
 si = si(1:2*kk); sj = sj(1:2*kk); ss = ss(1:2*kk);
-Gmat = sparse(si,sj,ss,kk+1,nsta);
+Gmat = sparse(si,sj,ss,kk,nsta);
+
+% make sure groups have no overlap
+grped = 0;
+while grped == 0
+    regrp = 0;
+    for ig1 = 1:Ngrp
+        if regrp; break; end
+        for ig2 = ig1+1:Ngrp
+            if regrp; break; end
+            if any(intersect(grps{ig1},grps{ig2})) % if groups have overlapping members
+                grps{ig1} = unique([grps{ig1}(:);grps{ig2}(:)]); % put all members in first group
+                grps(ig2) = []; % kill second group
+                Ngrp = Ngrp-1; % 1 fewer groups
+                regrp = 1; % break cycle to restart with new groupings
+            end
+        end
+    end
+    if regrp; continue; end
+    grped = 1; % can only get here if no regrouping because all groups have unique stations
+end
+% use only largest group
+Ngrpmax = 0;
+for ig = 1:Ngrp
+    if length(grps{ig})>Ngrpmax
+        igrpmax = ig; 
+        Ngrpmax = length(grps{ig});
+    end
+end            
+
+% find stations with no info
+noinfstas = find(sum(abs(Gmat)) == 0);
+% include stations from all but largest group
+for ig = 1:Ngrp
+    if ig~=igrpmax
+        noinfstas = union(noinfstas(:),grps{ig}(:));
+    end
+end   
 
 % now for any stas with no info, weak norm damp to zero
-noinfstas = find(sum(Gmat) == 0);
 Nnostas = length(noinfstas);
 H = sparse(1:Nnostas,noinfstas,ones(Nnostas,1),Nnostas,nsta);
 h = zeros(Nnostas,1);
 
-% damping mean to zero
-Gmat(kk+1,:)=ones(1,nsta); 
+% fix mean to zero - per group
+D = zeros(Ngrp,nsta);
+d = zeros(Ngrp,1);
+for ig = 1:Ngrp
+    D(ig,grps{ig}) = 1; 
+end
+D = sparse(D);
 
 % assemble
-Gmat = [Gmat;H];
-avec   = [avec;h];
-wvec = [wvec;ones(Nnostas,1)];
+Gmat = [Gmat;D;H];
+avec   = [avec;d;h];
+wvec = [wvec;ones(Ngrp+Nnostas,1)];
 
 
 % 
