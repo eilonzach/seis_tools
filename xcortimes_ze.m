@@ -152,7 +152,16 @@ for ig = 1:Ngrp
         igrpmax = ig; 
         Ngrpmax = length(grps{ig});
     end
-end            
+end  
+
+% get out if only two stations
+if Ngrpmax==2
+    dcor=nan(nsta,1);
+    dcstd=nan(nsta,1);
+    dvcstd=nan(nsta,1);
+    acor=nan(nsta,1);
+    return
+end
 
 % find stations with no info
 noinfstas = find(sum(abs(Gmat)) == 0);

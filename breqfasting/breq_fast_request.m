@@ -113,7 +113,7 @@ fprintf(fid,'.ALTERNATE MEDIA: EXABYTE\n');
 fprintf(fid,'.ALTERNATE MEDIA: DVD\n');
 fprintf(fid,'.LABEL %s\n',label);
 fprintf(fid,'.QUALITY B\n');
-fprintf(fid,'.END\n\n');
+fprintf(fid,'.END\n');
 
 %% For each event, run through stations getting time windows
 if Nsta~=Ntws % loop over both stations and time windows
@@ -127,8 +127,10 @@ if Nsta~=Ntws % loop over both stations and time windows
         fprintf(fid,'%s ',nwks{inws});
         fprintf(fid,'%s  ',datestr(starttimes(itws),'yyyy mm dd HH MM SS.FFF'));
         fprintf(fid,'%s ',datestr(endtimes(itws),'yyyy mm dd HH MM SS.FFF'));
-        fprintf(fid,'%u ',length({chans}));
-        fprintf(fid,'%s ',chans);
+        fprintf(fid,'%u ',length(chans));
+        for ic = 1:length(chans)
+            fprintf(fid,'%s ',chans{ic});
+        end
         fprintf(fid,'%s\n',locs{ilcs});
     end
     end
@@ -142,8 +144,10 @@ elseif Nsta == Ntws % assume each station goes with corresponding time window
         fprintf(fid,'%s ',nwks{inws});
         fprintf(fid,'%s  ',datestr(starttimes(ista),'yyyy mm dd HH MM SS.FFF'));
         fprintf(fid,'%s ',datestr(endtimes(ista),'yyyy mm dd HH MM SS.FFF'));
-        fprintf(fid,'%u ',length({chans}));
-        fprintf(fid,'%s ',chans);
+        fprintf(fid,'%u ',length(chans));
+        for ic = 1:length(chans)
+            fprintf(fid,'%s ',chans{ic});
+        end
         fprintf(fid,'%s\n',locs{ilcs});
     end
 end
@@ -161,6 +165,12 @@ for il = 1:nlines
 end
    
 fclose(fid);
+
+msgtxt = '';
+for il = 1:nlines
+    msgtxt = [msgtxt,messagetext{il}];
+end
+
 %% 'to' email address
 if strcmp(datatype,'SEED')==1; toaddress='breq_fast@iris.washington.edu'; 
 elseif strcmp(datatype,'dataless_SEED')==1; toaddress='dataless@iris.washington.edu'; 
@@ -169,5 +179,5 @@ elseif strcmp(datatype,'sync')==1; toaddress='sync@iris.washington.edu';
 else toaddress=e_mail; 
 end
 %% send to IRIS
-sendmail(toaddress,'IRIS data request',messagetext)
-sendmail(e_mail,'IRIS data request',messagetext)
+sendmail(toaddress,'IRIS_data_request',msgtxt)
+sendmail(e_mail,'IRIS_data_request',msgtxt)

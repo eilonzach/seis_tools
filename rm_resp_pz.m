@@ -1,4 +1,5 @@
 function odat = rm_resp_pz(idat,zz,pp,gain,samprate,extra_zp,ifplot)
+% odat = rm_resp_pz(idat,zz,pp,gain,samprate,extra_zp,ifplot)
 %% function to remove instrument response from data given poles, zeros and gain
 % adapted by Zach Eilon 2015/09/10 from function written by Ge Jin, 2014/02/27
 % 
@@ -62,7 +63,6 @@ norm_trans(isnan(norm_trans)) = 0;
 % Option to put on a low-pass filter for the high end stuff?! Prob not
 % needed.
 
-
 fftdata = fft(data);
 fftdata = fftdata(:).*norm_trans(:);
 odat = real(ifft(fftdata));
@@ -89,10 +89,12 @@ ylabel('Response','FontSize',18)
 % raw data
 subplot(3,2,3:4), hold on, set(gca,'fontsize',14)
 plot(delta*(0:N-1),idat,'b');
+title('Raw data')
 
 % response-removed data
 subplot(3,2,5:6), hold on, set(gca,'fontsize',14)
 plot(delta*(0:N-1),odat,'g');
+title('Resp-removed data')
 xlabel('Time (s)','FontSize',18)
 
 end
