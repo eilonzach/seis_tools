@@ -31,12 +31,24 @@ elseif strcmp(ph,'Sp')
 end
 
 tt_mig = cumsum([0;tt_mig]);
+if rayp_ref~=0  
+    tt_mig_ref = cumsum([0;tt_mig_ref]);
+end
+
+ind = [1:length(tt_mig)]; 
+
 % cut out repetitions in the vectors
 reps = find(diff(tt_mig)==0);
-ind = [1:length(tt_mig)]; 
 ind(reps)= []; %#ok<FNDSB>
+% cut out nans (i.e. inhomogeneous) from both vectors
 if rayp_ref~=0
-    tt_mig_ref = cumsum([0;tt_mig_ref]);
+    inhom = (imag(tt_mig)~=0) | (imag(tt_mig_ref)~=0);
+else
+    inhom = (imag(tt_mig)~=0);
+end
+ind(inhom) = [];
+
+if rayp_ref~=0
     ott = interp1(tt_mig(ind),tt_mig_ref(ind),itt,'linear',nan);
 else
     ott = interp1(tt_mig(ind),zz(ind),itt,'linear',nan);    
