@@ -181,6 +181,12 @@ for ip = 1:length(phases)
 %             end
 
 
+            %% remove instrument response
+            for ic = 1:3
+                datc(:,ic) = rm_resp(datc(:,ic),tr(ic).sacpz.zeros,tr(ic).sacpz.poles,tr(ic).sacpz.constant,...
+                                     tr(ic).sampleRate,strcmp(tr(ic).sacpz.units,'M'),0);
+            end
+            
             %% down/up sample
             for ic = 1:3
                 if samprate~=tr(1).sampleRate
@@ -197,12 +203,6 @@ for ip = 1:length(phases)
                 tt_raw = tr(ic).startTime + [0:tr(ic).sampleCount-1]'./tr(ic).sampleRate/86400;
                 tt_rel = (tt_raw - datenum(evinfo(ie).PreferredTime))*86400 - arr_times(ie,ip);
                 datc(:,ic) = interp1(tt_rel,tr(ic).data,tt_win);
-            end
-
-            %% remove instrument response
-            for ic = 1:3
-                datc(:,ic) = rm_resp(datc(:,ic),tr(ic).sacpz.zeros,tr(ic).sacpz.poles,tr(ic).sacpz.constant,...
-                                     tr(ic).sampleRate,strcmp(tr(ic).sacpz.units,'M'),0);
             end
 
             %% Rotate to ZNE 

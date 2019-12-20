@@ -17,27 +17,27 @@ if nargin < 5|| isempty(ofile), ifsave = false; else ifsave = true; end
 np = length(kernels);
 swperiods = zeros(np,1); for ip = 1:np, swperiods(ip) = kernels{ip}.period; end
 
-
+cols = colour_get(swperiods,max(swperiods),min(swperiods),cool);
 
 %% plot kernels
 h = zeros(np,1);
 for ip = 1:np
     if ifanis
         Z = kernels{ip}.Z/1e3;
-    h(ip)=plot(ax1,kernels{ip}.Vsv,Z,'linewidth',2);
-        plot(ax1,kernels{ip}.Vsh,Z,':','linewidth',2)
-        plot(ax2,kernels{ip}.Vpv,Z,'linewidth',2)
-        plot(ax2,kernels{ip}.Vph,Z,':','linewidth',2)
+    h(ip)=plot(ax1,kernels{ip}.Vsv,Z,  'linewidth',2,'color',cols(ip,:));
+        plot(ax1,kernels{ip}.Vsh,Z,':','linewidth',2,'color',cols(ip,:))
+        plot(ax2,kernels{ip}.Vpv,Z,    'linewidth',2,'color',cols(ip,:))
+        plot(ax2,kernels{ip}.Vph,Z,':','linewidth',2,'color',cols(ip,:))
         labstrs = 'SV=solid, SH=dash'; labstrp = 'PV=solid, PH=dash';
     elseif isfield(kernels{1},'Vsv')
         Z = kernels{ip}.Z/1e3;
-    h(ip)=plot(ax1,kernels{ip}.Vsv+kernels{ip}.Vsh,Z,'linewidth',2);
-        plot(ax2,kernels{ip}.Vpv+kernels{ip}.Vph,Z,'linewidth',2)        
+    h(ip)=plot(ax1,kernels{ip}.Vsv+kernels{ip}.Vsh,Z,'linewidth',2,'color',cols(ip,:));
+        plot(ax2,kernels{ip}.Vpv+kernels{ip}.Vph,Z,  'linewidth',2,'color',cols(ip,:))        
         labstrs = ''; labstrp = '';
     else
         Z = (kernels{ip}.Z1+kernels{ip}.Z2)/2;
-    h(ip)=plot(ax1,kernels{ip}.Kzh_Vs,Z,'linewidth',2);
-        plot(ax2,kernels{ip}.Kzh_Vp,Z,'linewidth',2);
+    h(ip)=plot(ax1,kernels{ip}.Kzh_Vs,Z,'linewidth',2,'color',cols(ip,:));
+        plot(ax2,kernels{ip}.Kzh_Vp,Z,  'linewidth',2,'color',cols(ip,:));
         labstrs = ''; labstrp = '';
     end
 end

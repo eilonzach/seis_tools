@@ -150,7 +150,10 @@ for ii=1:Nreq
                 [~,~,~,~,~,rt0,rt1]=parse_sacpz_filename(respfiles(iresp).name);
                 rt0 = datenum([rt0(1),jday2mody(rt0(1), rt0(2)),rt0(3),rt0(4),rt0(5)]);
                 rt1 = datenum([rt1(1),jday2mody(rt1(1), rt1(2)),rt1(3),rt1(4),rt1(5)]);
-                if (tr.startTime > rt0) && (tr.startTime < rt1), continue, end
+                % if event within this time, this is desired respfile
+                if (tr.startTime > rt0) && (tr.startTime < rt1)
+                    break; 
+                end
             end
             if isempty(respfiles(iresp).name)
                 stop

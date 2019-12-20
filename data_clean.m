@@ -24,7 +24,7 @@ function [ datwf,datf,datwc,datc,fdeets,ttws,tts ] = data_clean( traces,cleaning
 % OUTPUTS
 %  datwf   = cleaned, windowed, tapered, filtered data in columns
 %  datf    = cleaned, filtered data in columns
-%  datc    = cleaned, windowed, tapered data in columns
+%  datwc    = cleaned, windowed, tapered data in columns
 %  datc    = cleaned data in columns
 %  filtnam = string with filter information
 %  ttws    = vector of times for the filtered, windowed traces

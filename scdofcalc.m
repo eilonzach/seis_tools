@@ -1,7 +1,7 @@
 function [dof,tim]=scdofcalc(xx,option)
 % [dof,tim]=scdofcalc(xx,option)
-% scdofcalc.m  calculate degrees of freedom a la Silver and Chan for a time
-% series xx or from a noise series XY filename
+% scdofcalc.m  calculate degrees of freedom a la Silver and Chan 1991 for a
+% time series xx or from a noise series XY filename
 % optional arguments: 
 % [] = xx is the time series. 
 % 'filenam' = xx is the name of the file with the time series

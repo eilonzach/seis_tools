@@ -15,7 +15,7 @@ function [phiSC,dTSC, Ru, Tu, Emap, inipolest,phiEV,dTEV,Lmap] = SC_unsplit( dat
 %     Tu        = time series of unsplit data on T component
 %     Emap      = energy map from grid search (Min Energy method)
 %     inipolest = estimated initial polarisation of wave
-%  - if nargout ? 6 ignore this
+%  - if nargout < 7 ignore this
 %     phiEV     = estimated fast direction of anisotropy (Eigenvalue method)
 %     dTEV      = estimated splitting time (Eigenvalue method)     
 %     Lmap      = eigenvalue map from grid search (Eigenvalue method)
