@@ -89,6 +89,14 @@ card.Qmu(isinf(card.Qmu) & card.depth>2500) = 0 ; % fix issue where linterp make
 card.Qmu(isnan(card.Qmu) & card.depth<10) = 999 ; % fix issue where linterp makes Inf Qmu nan.
 card.Qmu(isinf(card.Qmu)) = 999 ; % fix issue where linterp makes Inf Qmu nan.
 
+%% make sure in units of km (or km/s, or kg/m^2)
+if max(card.R)>7000, card.R = card.R/1000; end
+if max(card.rho)>100, card.rho = card.rho/1000; end
+if max(card.vpv)>100, card.vpv = card.vpv/1000; end
+if max(card.vph)>100, card.vph = card.vph/1000; end
+if max(card.vsv)>100, card.vsv = card.vsv/1000; end
+if max(card.vsh)>100, card.vsh = card.vsh/1000; end
+
 %% find node numbers
 N = length(card.R);
 ocind = find(card.Qmu==0 & card.vsv==0);
@@ -111,6 +119,7 @@ for ii = 1:N
         1000*card.R(kk),1000*card.rho(kk),1000*card.vpv(kk),1000*card.vsv(kk),card.Qk(kk),card.Qmu(kk),1000*card.vph(kk),1000*card.vsh(kk),card.eta(kk));
 end
 fclose(fid);
+fprintf('cardfile %s written\n',ofile);
 end
 
 end

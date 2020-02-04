@@ -4,7 +4,7 @@ function [ Vpv,Vph ] = VpvVph_from_VpPhi( Vp,phi )
 %   and the value of phi, which describes the radial anisotropy, where
 % 
 %   Vp^2 = (4Vph^2 + Vpv^2)/5
-%   xi = Vpv^2/Vph2 (=C/A)
+%   phi = Vpv^2/Vph2 (=C/A)
 
 
 Vph = Vp .* sqrt(5./(phi+4));
