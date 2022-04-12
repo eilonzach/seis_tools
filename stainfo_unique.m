@@ -24,7 +24,7 @@ end
 fns = fieldnames(stainfo);
 for iff = 1:length(fns)
     if length(stainfo.(fns{iff}))>1
-        stainfo.(fns{iff})(kill) = [];
+        stainfo.(fns{iff})(kill,:) = [];
     end
 end
 stainfo.nstas = length(stainfo.stas);

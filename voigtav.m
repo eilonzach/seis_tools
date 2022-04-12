@@ -10,7 +10,7 @@ function [ Vs_vt, Vp_vt ] = voigtav( Vsh,Vsv,Vph,Vpv,eta )
 %   Vp_vt = sqrt( (4*Vph.^2 +   Vpv.^2)/5 );
 
 
-if nargin > 2
+if nargin > 4
 
 c11 = Vph.^2;
 c22 = c11;

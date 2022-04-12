@@ -57,23 +57,23 @@ pars.dm         = 1;          % dim'less grain-size exponent
 % solidus & homologous temperature
 depth_km = P*pars.km_per_GPa;
 Tm_K = pars.Tm_50km + pars.dTm_dz*(depth_km - 50);
-Th = T/Tm_K;
+Th = T./Tm_K;
 
 % compute viscosity reduction just below solidus, eqn. (29)
 Aeta = 1;
 if Th >= pars.Teta
   if Th < 1 % below melting point
-      Aeta = exp(-(Th-pars.Teta)/(Th*(1-pars.Teta))*log(pars.gamma));
+      Aeta = exp(-(Th-pars.Teta)./(Th*(1-pars.Teta))*log(pars.gamma));
   else % DO include a melting effect, in line with Mei et al, 2002
       Aeta = exp(-pars.lambda*phi)/pars.gamma; 
   end
 end
-Aeta = Aeta*vfac; % cheating adding an extra factor
+Aeta = Aeta.*vfac; % cheating adding an extra factor
 
 % compute viscosity, eqn. (28)
 eta = 10^pars.log10_etar.*(d_mm/pars.dr).^pars.dm.* ...
-    exp(pars.H/pars.R.*(1/T - 1/pars.Tr)).* ...
-    exp(pars.Omega/pars.R*(P/T - pars.Pr/pars.Tr)*1e9).* ...
+    exp(pars.H/pars.R.*(1./T - 1/pars.Tr)).* ...
+    exp(pars.Omega/pars.R*(P./T - pars.Pr/pars.Tr)*1e9).* ...
     Aeta;
 
 % compute shear modulus in GPa, eqn (27)
@@ -82,10 +82,10 @@ if nargin<6 || isempty(Gu)
   Gu = pars.muU0 + pars.dmuU_dT*(T-273) + pars.dmuU_dP*(P-0);
 end
 
-Ju = 1/(Gu*1e9); % Pa
+Ju = 1./(Gu*1e9); % Pa
 
 % compute Maxwell time, seconds
-tauM = Ju*eta;
+tauM = Ju.*eta;
 
 % compute peak width, eqn (25)
 sigmaP = 4;
@@ -113,14 +113,14 @@ end
 p = 1./(omega.*tauM);
 
 % compute the real and imaginary parts of the compliance, eqn (26)
-J1 = Ju*(1 + pars.AB*p^pars.alphaB/pars.alphaB + ...
-       sqrt(2*pi)/2*AP*sigmaP*(1 - erf( log(pars.tauP/p)/(sqrt(2)*sigmaP) )));
-J2 = Ju*(pi/2*(pars.AB*p^pars.alphaB + ...
-             AP*exp(-(log(pars.tauP/p))^2/(2*sigmaP^2))) + p);
+J1 = Ju.*(1 + pars.AB*p.^pars.alphaB/pars.alphaB + ...
+       sqrt(2*pi)/2*AP*sigmaP*(1 - erf( log(pars.tauP./p)/(sqrt(2)*sigmaP) )));
+J2 = Ju.*(pi/2*(pars.AB*p.^pars.alphaB + ...
+             AP*exp(-(log(pars.tauP./p)).^2/(2*sigmaP^2))) + p);
 
 % form complex compliance
 J = J1 + 1i*J2;
 
-qinv=J2/J1;
-G=abs(1/J);
+qinv=J2./J1;
+G=abs(1./J);
   

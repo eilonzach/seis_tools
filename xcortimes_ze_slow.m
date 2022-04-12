@@ -74,38 +74,17 @@ avec=zeros(nmat,1);
 wvec=ones(nmat,1);
 lmax=round(lagmax./dt);   % Max lag allowed, should set in fcn
 
-%% limit by distance
-% if user selects, apply distance maximum to inter-station distance to use
-% here build lookup table of distances
-if ~isempty(gclim)
-    staDist = nan(nsta);
-    for is = 1:nsta
-        staDist(:,is) = distance(latlon(is,1),latlon(is,2),latlon(:,1),latlon(:,2)); 
-    end
-    staDist_toofar = staDist > gclim;
-end
-
-%% groups
-% An issue here is that if there are groups of stations with no
-% cross-values (no differntial measurements tying them) then the
-% enforcement of a constraint line in the inversion (mean=0) will
-% artificially merge the groups' measurements when really there are
-% no constraints as to any differential values between the two
-% groups (those differential values may actually be large). So need
-% to find groups of stations with internal links.
-
 % groups of stations
 Ngrp = 1;
 grps = cell({});
 
-%% cycle through pairs
 kk=0;
 %if (iplot==1) disp('building lag matrix...'); end
 for ii=1:(nsta-1) % for each station...
     for jj=(ii+1):nsta % loop over combos with all stations after it
         %  check if stations too far apart?
         if ~isempty(gclim)
-            if staDist_toofar(ii,jj)
+            if distance(latlon(ii,1),latlon(ii,2),latlon(jj,1),latlon(jj,2)) > gclim
                 continue 
             end
         end
@@ -119,31 +98,24 @@ for ii=1:(nsta-1) % for each station...
         sj(2*kk+[-1,0]) = [ii jj];  % j indices of G
         ss(2*kk+[-1,0]) = [1 -1];  % j indices of G
         
-
         % assign to groups
         if kk == 1, grps{1}(1)=ii; end
-        nogroup = true;
         for ig = 1:Ngrp
             if ismember(ii,grps{ig})
                 % ii is in group ig; assign jj to that group and get out
                 grps{ig} = unique([grps{ig};jj]);
-                nogroup = false;
                 break 
             end
             if ismember(jj,grps{ig})
                 % jj is in group ig; assign ii to that group and get out
                 grps{ig} = unique([grps{ig};ii]);
-                nogroup = false;
                 break 
             end
-        end
-        % if at this point, ii and jj are in no group, make a new group
-        if nogroup    
+            % if at this point, ii and jj are in no group, make a new group
             Ngrp = Ngrp+1;
             grps{Ngrp} = [ii;jj];
         end
         
-% old way of making G matrix, before sparse - just here for reference.
 %         Gmat(kk,ii) = 1;
 %         Gmat(kk,jj) = -1;
     end
@@ -153,8 +125,6 @@ avec = avec(1:kk);
 wvec = wvec(1:kk);
 si = si(1:2*kk); sj = sj(1:2*kk); ss = ss(1:2*kk);
 Gmat = sparse(si,sj,ss,kk,nsta);
-
-
 
 % make sure groups have no overlap
 grped = 0;
