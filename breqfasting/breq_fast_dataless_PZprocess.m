@@ -68,9 +68,26 @@ fprintf('   downloading %s\n',SEED_file_name)
 file_name = mget(ftpobj,SEED_file_name);
 close(ftpobj)
 
+% get name of file just downloaded
+file_name = regexprep(file_name,[pwd,'/'],'');
+
+
 %% read the data with rdseed
 for ii = 1:length(file_name)
-    system(sprintf('/usr/local/bin/rdseed -f %s -p',file_name{ii}))
+    %% if tar, unpack
+    if any(regexp(file_name{ii},'.tar'))
+        % remove ".dataless" suffix
+        tarfile = regexprep(file_name{ii},'\.dataless','');
+        movefile(file_name{ii},tarfile); 
+        % unpack tar
+        untarfile = untar(tarfile);
+        for iff = 1:length(untarfile)
+            if any(regexp(untarfile{iff},sprintf('%s/.*%s.dataless',regexprep(tarfile,'.tar',''),label)))
+                datalessfile = untarfile{iff};
+            end
+        end
+    end
+    system(sprintf('/usr/local/bin/rdseed -f %s -p',datalessfile))
 end
 
 %% move to respdir

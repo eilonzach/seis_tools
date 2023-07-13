@@ -178,6 +178,10 @@ elseif strcmp(datatype,'miniSEED')==1; toaddress='miniseed@iris.washington.edu';
 elseif strcmp(datatype,'sync')==1; toaddress='sync@iris.washington.edu'; 
 else toaddress=e_mail; 
 end
+
+
 %% send to IRIS
-sendmail(toaddress,'IRIS_data_request',msgtxt)
-sendmail(e_mail,'IRIS_data_request',msgtxt)
+warning('gmail has prevented MATLAB from sending emails...')
+% sendmail(toaddress,'IRIS_data_request',msgtxt)
+% sendmail(e_mail,'IRIS_data_request',msgtxt)
+

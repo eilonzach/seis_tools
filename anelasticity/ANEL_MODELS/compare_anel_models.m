@@ -11,8 +11,8 @@ P = [0.1,2.5];
 T_C = [1000:20:1500]'; T = T_C+273;
 
 figure(1);clf
-for iff = 1:2
-for ip = 1:2
+for iff = 1:1
+for ip = 2
 
     for it = 1:length(T)
     [ ~,~,~,q_takei(it)] = takei2017 ( T(it),d(ip),P(ip),2*pi*f(iff),1 );

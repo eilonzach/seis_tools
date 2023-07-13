@@ -1,5 +1,5 @@
-function [ J1,J2,tauM,qinv,G ] = takei2017( T,d,P,omega,vfac,Gu,phi)
-% [ J1,J2,tauM,qinv,G ] = takei2017( T,d,P,omega,vfac,Gu,phi)
+function [ J1,J2,tauM,qinv,G ] = takei2017( T,d,P,omega,vfac,Gu,phi,Tm)
+% [ J1,J2,tauM,qinv,G ] = takei2017( T,d,P,omega,vfac,Gu,phi,Tm)
 % Inputs:
 %   T = temperature (K)
 %   d = grain size (meters)
@@ -8,6 +8,7 @@ function [ J1,J2,tauM,qinv,G ] = takei2017( T,d,P,omega,vfac,Gu,phi)
 %   vfac = viscosity prefactor
 %   Gu = unrelaxed shear modulus (GPa) if you want a non-default one. 
 %   phi = volumetric melt fraction (porosity)
+%   Tm = solidus temperature (K) if externally calculated
 % Output: 
 %  J1 = storage compliance (1/Pa)
 %  J2 = loss  compliance (1/Pa)
@@ -27,6 +28,7 @@ function [ J1,J2,tauM,qinv,G ] = takei2017( T,d,P,omega,vfac,Gu,phi)
 
 
 if nargin<7, phi=0; end
+if nargin<8, Tm=[]; end
 
 d_mm = d*1000;
 
@@ -56,7 +58,11 @@ pars.dm         = 1;          % dim'less grain-size exponent
 
 % solidus & homologous temperature
 depth_km = P*pars.km_per_GPa;
-Tm_K = pars.Tm_50km + pars.dTm_dz*(depth_km - 50);
+if isempty(Tm) || isnan(Tm)
+    Tm_K = pars.Tm_50km + pars.dTm_dz*(depth_km - 50);
+else
+    Tm_K = Tm;
+end
 Th = T./Tm_K;
 
 % compute viscosity reduction just below solidus, eqn. (29)

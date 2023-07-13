@@ -16,10 +16,11 @@ function [ datwf,datf,datwc,datc,fdeets,ttws,tts ] = data_clean( traces,cleaning
 %     cleaning_parm.taperx   = proportion of trace that is taper (each end)
 %     cleaning_parm.fhi      = high bp freq.
 %     cleaning_parm.flo      = low bp freq.
-%     cleaning_parm.filtopt      = low bp freq.
+%     cleaning_parm.filtopt  = low bp freq.
 %     cleaning_parm.npoles   = number of poles for filter
 %     cleaning_parm.npass    = # of passes for filter: 1=causal, 2=acausal
 %     cleaning_parm.norm     = whether (1) or not (0) to normalise traces by std
+%     cleaning_parm.detrend  = whether (1) or not (0=default) to detrend traces
 %
 % OUTPUTS
 %  datwf   = cleaned, windowed, tapered, filtered data in columns
@@ -69,6 +70,10 @@ fdeets = [fhi flo cp.npoles];
 % [z,p,k]=butter(cp.npoles, [flo, fhi].*dt.*2.);
 % [sos,g]=zp2sos(z,p,k); bb=sos; aa=g;
 
+if ~isfield(cp,'detrend')
+    cp.detrend = 0;
+end
+
 %% Make the taper window
 % WAS nwin=round((cp.postx+cp.prex)/dt)+1; % window length in samples
 nwin=round((cp.postx+cp.prex)/dt); % window length in samples
@@ -91,7 +96,9 @@ for is=1:nsta
     nnan=find(~isnan(rec)); % find not-NaNs
     if isempty(nnan), datwf(:,is) = NaN; continue, end
     % rec(nnan)=rec(nnan)-mn; % take off mean 
-%     rec(nnan)=detrend(rec(nnan)); % detrend not-nans
+    if cp.detrend
+        rec(nnan)=detrend(rec(nnan)); % detrend not-nans
+    end
     rec(isnan(rec))=0; %set NaNs to zero
     wdo1 = [zeros(nnan(1)-1,1);tukeywin(length(nnan),2*cp.taperx);zeros(length(rec)-nnan(end),1)];
     rec = rec.*wdo1; % first taper of whole window. Sets NaNs to zero and tapers end of non-NaN
@@ -125,7 +132,9 @@ for is=1:nsta
     recf = filt_quick(rec,flo,fhi,dt,cp.npoles,cp.npass);
 
     % detrend again
-%     recf = detrend(recf);
+    if cp.detrend
+        recf=detrend(recf);
+    end
 
     datf(:,is)=recf;
     

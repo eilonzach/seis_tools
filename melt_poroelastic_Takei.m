@@ -15,8 +15,8 @@ function [ Vpu_m, Vsu_m ] = melt_poroelastic_Takei( Vpu,Vsu,phi,A,Km )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 % INPUTS:
-%  Vpu = unrelaxed Vp 
-%  Vsu = unrelaxed Vs
+%  Vpu = unrelaxed Vp (m/s)
+%  Vsu = unrelaxed Vs (m/s)
 %  phi = melt fraction
 %  A   = wetting angle factor (1:2.3, Yoshino)
 %  Km  = bulk modulus of the melt (Pa)

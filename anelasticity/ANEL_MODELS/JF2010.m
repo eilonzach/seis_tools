@@ -78,7 +78,7 @@ on = ones(size(T));
 ip1 = zeros(size(T)); 
 ip2 = zeros(size(T)); 
 %integration for peak wrt to dtau 0 - inf;
-for ii = 1 : length(T)
+for ii = 1 : numel(T)
   ij1(ii) = quadl(@(tau)J1anel(tau,omega(ii)),tauL(ii),tauH(ii));
   ij2(ii) = quadl(@(tau)J2anel(tau,omega(ii)),tauL(ii),tauH(ii));
   ip1(ii) = quadgk(@(tau)J1p(tau,omega(ii),tauP(ii)),0,inf);
