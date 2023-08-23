@@ -3,7 +3,7 @@ function [ visc_melt,visc_hk ] = melt_visc_reduce_TH09( phi, visc_nomelt )
 % 
 %   Function to apply the contiguity model of Takei and Holtzman 2009a
 % 
-%  phi is the porosity, i.e volumetric melt fraction 
+%  phi is the porosity, i.e volumetric melt fraction NOT PERCENT
 % 
 % eta_wmelt = 0.2 * contig^2 * eta_nomelt
 % contig = 1 - A * sqrt(phi)
