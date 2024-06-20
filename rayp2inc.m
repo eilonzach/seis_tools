@@ -10,7 +10,7 @@ end
 z = 6371-r;
 
 if nargin > 2
-    inc = asind( (r2d(rayp) .* V)./(6371-z) );
+    inc = asind( (rad2deg(rayp) .* V)./(6371-z) );
 else
     inc = asind( rayp.*V );
 end
