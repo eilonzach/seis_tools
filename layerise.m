@@ -32,12 +32,20 @@ function [zlayt,zlayb,vlay,varargout] = layerise(Z,V,dvmin,ifplot,varargin)
 %     Z. Eilon 08/2016
 %     Modified brb2022.06.29. 
 
-break_v    = 0.01 ; % Tend toward break into a layer every this much velocity change. 
-break_z    = 10   ; % Tend toward making all layers smaller than this. 
-% break_v    = 0.05 ; % Tend toward break into a layer every this much velocity change. 
-% break_z    = 30   ; % Tend toward making all layers smaller than this. 
-break_grad = 0.025; % If gradient in v between two provided depths is greater than this, divide a layer here. Mostly this value is irrelevant, we just identify grad==inf, i.e. discontinuities. 
+% ifplot = 1; warning('if plot force true'); 
+
+% Decide on layerise resolution. 
 % Note: The new model will not get finer than the provided Z array. 
+if isempty(dvmin); 
+    break_v                  = 0.15 ; % Tend toward break into a layer every this much velocity change. 
+    break_z                  = 10   ; % Tend toward making all layers smaller than this. Maybe MORE important than break_v: if this is too large, individual propmat pulses from seperate layers will not "touch" each other, and a velocity gradient will become distinct pulses. Per my testing, it seems that about 10 km spacing allows propmat with 4 s synthetic pulse to work properly with "touching" pulses that convey velocity gradients properly. 
+else; 
+    break_v                  = dvmin; 
+    break_z                  = 10 / 0.15 * break_v; % Don't want to provide break_z as it's own argument. Just scale this from break_v. 
+    if break_z > 30; break_z = 30; end % But cap break_z between reasonable values. 
+    if break_z < 3 ; break_z = 3 ; end
+end
+break_grad                   = 1    ; % If gradient in v between two provided depths is greater than this, divide a layer here. Mostly this value is irrelevant, we just identify grad==inf at Moho, Sediment, or other discontinuities. 
 
 if nargin<4 || isempty(ifplot)
     ifplot=false;
@@ -137,7 +145,6 @@ if process_varargin;
     end
 end
          
-ifplot = false; if ifplot; warning('Setting ifplot = true'); end; 
 if ifplot
     figure(11); clf; set(gcf,'pos', [-581 247 514 796], 'color', 'white'); 
     h = tiledlayout(1, 1+length(varargin),'TileSpacing','compact'); 
@@ -150,6 +157,9 @@ if ifplot
     set(gca,'ydir','reverse',...
         'ylim',[0, max(Z)],'xlim',[0.9*min(V) 1.1*max(V)])
     
+    text(min(V), 250, sprintf('nlay=%1.0f\nbreak z=%1.1f\nbreak v=%1.3f',...
+        nlay,break_z,break_v), 'fontsize', 12); 
+    
     % other vars
     for iv = 1:length(varargin)
         nexttile; hold on; box on; 
@@ -159,8 +169,6 @@ if ifplot
         set(gca,'ydir','reverse','ylim',[0, max(Z)],...
             'xlim',[0.9*min(varargin{iv}) 1.1*max(varargin{iv})])    
     end
-    text(min(V), 250, sprintf('nlay=%1.0f\nbreak z=%1.1f\nbreak v=%1.3f',...
-        nlay,break_z,break_v), 'fontsize', 12); 
 end
 
 end % End function
