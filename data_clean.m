@@ -129,6 +129,7 @@ for is=1:nsta
 %     recf=filtfilt(bb, aa, rec);
 %     % lop off padding
 %     recf = recf(1001:end-1000);
+
     recf = filt_quick(rec,flo,fhi,dt,cp.npoles,cp.npass);
 
     % detrend again

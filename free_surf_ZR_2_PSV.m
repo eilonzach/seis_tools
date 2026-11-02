@@ -1,5 +1,5 @@
-function [ P,SV ] = free_surf_ZRT_2_PSVSH(Z, R,rayp,alpha,beta,Zconv )
-%[ P,SV ] = free_surf_corr( Z, R,rayp,alpha,beta )
+function [ P,SV ] = free_surf_ZR_2_PSV(Z, R,rayp,alpha,beta,Zconv )
+%[ P,SV ] = free_surf_ZR_2_PSV( Z, R,rayp,alpha,beta )
 %   Function to convert Z and R traces to P,SV
 %  R defined as positive away from source
 %  Z default is defined as positive upwards; can be switched if Zconv==2
@@ -29,10 +29,11 @@ elseif Zconv==2 % Z is defined as positive down
     zsng = -1;
 end
 
+rayp = rayp_sdeg2skm(rayp);
 
-rayp = rayp_sdeg2skm(12);
-alpha = 6.3;
-beta = 3.8;
+% rayp = rayp_sdeg2skm(12);
+% alpha = 6.3;
+% beta = 3.8;
 
 qa = sqrt(alpha.^-2 - rayp.^2);
 qb = sqrt(beta.^-2 - rayp.^2);
@@ -48,6 +49,12 @@ F(1:2,1:2) = [Fz_p,Fz_sv;Fr_p,Fr_sv];
 
 invF = inv(F);
 
+
+% finishing off function
+U = [Z(:) R(:)];
+W = U*(invF(1:2,1:2))';
+P = W(:,1);
+SV = W(:,2);
 
 end
 

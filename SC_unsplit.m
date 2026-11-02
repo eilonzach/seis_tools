@@ -1,5 +1,5 @@
-function [phiSC,dTSC, Ru, Tu, Emap, inipolest,phiEV,dTEV,Lmap] = SC_unsplit( datN, datE, samprate, plotopt )
-% [phiSC,dTSC, Ru, Tu, Emap, inipolest,phiEV,dTEV,Lmap] = SC_unsplit( datN, datE, samprate, plotopt )
+function [phiSC,dTSC, Ru, Tu, Emap, inipolest,phiEV,dTEV,Lmap] = SC_unsplit( datN, datE, samprate, plotopt,inipol_tru )
+% [phiSC,dTSC, Ru, Tu, Emap, inipolest,phiEV,dTEV,Lmap] = SC_unsplit( datN, datE, samprate, plotopt ,inipol_tru )
 % do Silver and Chan unsplitting
 %
 % INPUTS:
@@ -7,6 +7,7 @@ function [phiSC,dTSC, Ru, Tu, Emap, inipolest,phiEV,dTEV,Lmap] = SC_unsplit( dat
 %     datE      = time series of data on E component
 %     samprate  = sample rate of data (per second)
 %     plotopt   = option to plot (1) or not (0)
+%     inipol_tru= true, known initial polarization; assume to be BAZ 
 % 
 % OUTPUTS:
 %     phiSC     = estimated fast direction of anisotropy (Min Energy method)
@@ -23,12 +24,16 @@ function [phiSC,dTSC, Ru, Tu, Emap, inipolest,phiEV,dTEV,Lmap] = SC_unsplit( dat
 if nargin < 4
     plotopt = 0;
 end
+if nargin < 5 || isempty(inipol_tru)
+    inipolest = pol_vidale_simple2D( datN,datE );
+else
+    inipolest = inipol_tru;
+end
 
 ddT  = 0.1;
 dphi = 2;
 
 %% Measure initial polarisation following Vidale 1986
-[ inipolest ] = pol_vidale_simple2D( datN,datE );
 
 %% rotate data to R and T
 [ datRT ] = zne2zrt( [datN,datE], inipolest );

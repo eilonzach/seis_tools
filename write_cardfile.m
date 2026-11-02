@@ -31,6 +31,7 @@ end
 % if tref > 0; 
 %     tref = - tref; 
 %     fprintf('Making mineos attenuation reference velocity negative for Russell Mineos code. '); 
+% NOTE should this say "reference PERIOD" (not "velocity") above?
 %     % brb20240606 TODO add option to allow positive if using Zach's version of Mineos. 
 % end
 

@@ -5,7 +5,7 @@ function plot_resp( resp,faxis,extra_zp )
 % 
 % INPUTS 
 %   resp     = complex response vector
-%   zeros    = frequency vector
+%   faxis    = frequency vector
 %   extra_zp = [0] flag to say that there are extra zeros (positive) or poles (negative) 
 %              in the response, which should be accounted for when plotting the response
 if nargin<3

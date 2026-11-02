@@ -225,7 +225,11 @@ for f=1:nfiles
                             case 'end'
                                 % convert later together
                                 if(npz==1); pz{f}.e=pre; end
-                                pz{f}.e(npz,1)=words(4);
+                                if numel(words)<4 % case when no end time is actually provided
+                                    pz{f}.e(npz,1) = {'2599-12-31T23:59:59'}; % so set end time to be standard long end.
+                                else
+                                    pz{f}.e(npz,1)=words(4); % otherwise read it
+                                end
                             case 'latitude'
                                 % use sac field
                                 if(npz==1); pz{f}.stla=pre; end

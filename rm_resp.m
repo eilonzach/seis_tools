@@ -9,8 +9,8 @@ function odat = rm_resp(idat,zz,pp,gain,samprate,extra_zp,ifplot)
 %   pp       = vector of complex poles
 %   gain     = gain amplitude
 %   samprate = sample rate, in Hz
-%   extra_zp = [0] flag to say that there are extra zeros (positive) or poles (negative) 
-%              in the response, which should be accounted for when plotting the response
+%   extra_zp = [0] flag to say that there are spurious extra zeros (positive) or poles (negative) 
+%              in the response, which should be accounted for when removing the response
 %   ifplot   = [0] option to plot the response function,
 %              and the data before & after. 
 %
@@ -41,6 +41,15 @@ else
      faxis = [0:N/2,-N/2+1:-1]*(1/T);
 end
 
+if extra_zp~=0
+    if extra_zp > 0
+        zz = sort(zz);
+        zz = zz(1+extra_zp:end);
+    else
+        zz = [zeros(abs(extra_zp),1);zz];
+    end
+end
+
 % calc response function in f-domain
 w = faxis.*2*pi;
 resp = ones(size(w));
@@ -52,7 +61,15 @@ for iz = 1:length(zz)
 end
 resp = resp*gain;
 
-resp_plot = resp./(w.^extra_zp);
+% test here for non-flat response function between 1z and 10s
+rloggrad = log10(abs(resp(mindex(faxis,1)))./abs(resp(mindex(faxis,0.1))));
+if rloggrad>0.8
+    warning('looks like response has a log-slope of +1 in pass band - might be extra zero. If true sensor flat to velocity, this might return displacement.')
+elseif  rloggrad < -0.8
+    warning('looks like response has a log-slope of -1 in pass band - might be missing zero. If true sensor flat to velocity, this might return acceleration.')
+end
+
+% resp_plot = resp./(w.^extra_zp);
 
 % add extra high-pass filter to get rid of >200s stuff - Jingle's input
 lo_w=2*pi*lo_corner;
@@ -74,14 +91,14 @@ ind = faxis>0;
 
 % amplitude response
 subplot(3,2,1), hold on, set(gca,'fontsize',18,'xscale','log','yscale','log','FontSize',14)
-loglog(faxis(ind),abs(resp_plot(ind)),'r','Linewidth',1.5);
+loglog(faxis(ind),abs(resp(ind)),'r','Linewidth',1.5);
 xlim([1/T 2/delta])
 xlabel('Frequency (Hz)','FontSize',18)
 ylabel('Response','FontSize',18)
 
 % phase response
 subplot(3,2,2), hold on, set(gca,'fontsize',18,'xscale','log','Ytick',[-180:90:180],'FontSize',14)
-plot(faxis(ind),r2d(angle(resp_plot(ind))),'r','Linewidth',1.5);
+plot(faxis(ind),r2d(angle(resp(ind))),'r','Linewidth',1.5);
 xlim([1/T 2/delta]), ylim([-180 180])
 xlabel('Frequency (Hz)','FontSize',18)
 ylabel('Response','FontSize',18)

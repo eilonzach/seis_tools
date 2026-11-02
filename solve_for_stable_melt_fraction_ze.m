@@ -1,5 +1,5 @@
 function [solution] = solve_for_stable_melt_fraction_ze(T_K,P_GPa,C_h2o_solid,C_co2_solid,D_h2o,D_co2,solidus_str)
-% Using equations in appendix of Blatter et al. (2022), solve for
+% [solution] = solve_for_stable_melt_fraction_ze(T_K,P_GPa,C_h2o_solid,C_co2_solid,D_h2o,D_co2,solidus_str)% Using equations in appendix of Blatter et al. (2022), solve for
 % thermodynamically stable melt fraction given temperature
 %
 % In this version, assume melt free and dry solidus below 

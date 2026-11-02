@@ -26,7 +26,11 @@ inind = find(taxis >= winbgt & taxis <= winendt);
 dt = taxis(2)-taxis(1);
 taperlength = floor(tapertime./dt);
 
-tapr = hanning(taperlength*2);
+try
+    tapr = hanning(taperlength*2);
+catch
+    tapr = hann(taperlength*2);
+end
 windata(inind(1:taperlength),:) = diag(tapr(1:taperlength))*windata(inind(1:taperlength),:);
 windata(inind(end-taperlength+1:end),:) = diag(tapr(taperlength+1:end))*windata(inind(end-taperlength+1:end),:);
 

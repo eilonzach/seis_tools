@@ -57,9 +57,10 @@ while iv < nargin-2
     iv = iv+2;
 end
     
-
+% demean!! Need to do this for ACOR to be accurate, or it will be wrong to
+% the extent that std(X) =/= rms(X)
+data = demean(data);
     
-
 nsta=size(data,2);
 npt=size(data,1);
 nmat=nsta*(nsta-1)/2; % total number of combinations of statinos
@@ -267,10 +268,11 @@ dcstd=sqrt(diag(inv(Gmat'*Gmat)).*var(resid));
 % V = R.^2; 
 % dvcstd = sqrt(sum(V,2)./(nsta-2));
 for is = 1:nsta
-    dvcstd(is,1) = sqrt(sum(resid(Gmat(1:kk,is)~=0).^2)./(sum(Gmat(1:kk,is)~=0)-2));
+    % note need a factor of 2 on denominator
+    dvcstd(is,1) = sqrt(sum(resid(Gmat(1:kk,is)~=0).^2)./(2*sum(Gmat(1:kk,is)~=0)-2));
 end
 
-% Find acor
+% Find acor (and similarity?)
 stak = zeros(npt,1);
 tstak = [0:npt-1]';
 for is=1:nsta
@@ -281,12 +283,30 @@ jmx=npt-ceil(max(dcor));
 jmn=ceil(abs(min(dcor)))+1;
 ida=find(isfinite(stak) & (1:npt)'<jmx & (1:npt)'>jmn );
 acor = zeros(nsta,1);
+% simil = zeros(nsta,1);
 for is=1:nsta
-    acor(is)=sum(stak(ida).*data(ida+round(dcor(is)),is))./(std(stak(ida),1).*std(data(ida+round(dcor(is)),is),1))./length(ida);
+    sss = stak(ida);
+    ddd = data(ida+round(dcor(is)),is);
+    % acor(is)=sum(stak(ida).*data(ida+round(dcor(is)),is))./(std(stak(ida),1).*std(data(ida+round(dcor(is)),is),1))./length(ida);
+    acor(is)=sum(sss.*ddd)./(std(sss,1).*std(ddd,1))./length(ida);
+    % simil(is) = waveform_similarity(ddd,sss,sss);
 end
 
-dcor = dcor .* dt;
-dcstd=full(dcstd).* dt;
+% testing simil
+% simil2 = zeros(nsta);
+% for is1=1:nsta
+% for is2 = 1:nsta
+%     sss = stak(ida);
+%     ddd1 = data(ida+round(dcor(is1)),is1);
+%     ddd2 = data(ida+round(dcor(is2)),is2);
+%     simil2(is1,is2) = waveform_similarity(ddd1,ddd2,sss);
+% end
+% end
+
+% transform to units of time, not of integer lags
+dcor = dcor .* dt; 
+dcstd=full(dcstd) .* dt;
+dvcstd = dvcstd .* dt;
 
 %% Nan stations with no info
 dcor(noinfstas) = nan;
